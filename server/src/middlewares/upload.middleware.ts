@@ -26,6 +26,6 @@ export const uploadImage = multer({
 });
 
 export const uploadSingle = uploadImage.single("image");
-export const uploadMultiple = uploadImage.array("images", 6);
+export const uploadMultiple = uploadImage.array("images", 8);
 
 export default uploadImage;
