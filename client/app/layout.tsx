@@ -20,8 +20,8 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: {
-    default: `${SITE.name} — Premium Kittens for Loving Homes`,
-    template: `%s — ${SITE.name}`,
+    default: `${SITE.name} - Premium Kittens for Loving Homes`,
+    template: `%s - ${SITE.name}`,
   },
   description: SITE.description,
   keywords: ["kittens", "cats for sale", "cattery", "cat breeder", "adopt a kitten"],
