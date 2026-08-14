@@ -84,8 +84,8 @@ export function buildMetadata(config: SeoMetadataConfig): Metadata {
       images: [
         {
           url: imageUrl,
-          alt: imageAlt || `${SITE_NAME} — ${title}`,
-          ...imageDimensions,
+        alt: imageAlt || `${SITE_NAME} | ${title}`,
+        ...imageDimensions,
         },
       ],
     },
@@ -208,5 +208,5 @@ export function catImageAlt(
   index?: number,
 ): string {
   const base = `${name}${breed ? `, ${breed} kitten` : " kitten"} at ${SITE_NAME}`;
-  return typeof index === "number" ? `${base} — photo ${index + 1}` : base;
+  return typeof index === "number" ? `${base}, photo ${index + 1}` : base;
 }
