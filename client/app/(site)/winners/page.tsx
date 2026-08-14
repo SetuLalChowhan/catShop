@@ -13,7 +13,7 @@ export const revalidate = 60;
 export const metadata = buildMetadata({
   title: "Referral Winners & Adopter Community Spotlight",
   description:
-    "Meet our monthly referral contest winners and community champions — the Whisker Haven cat families who share the love and spread the word about our cattery.",
+    "Meet our monthly referral contest winners and community champions: the Whisker Haven cat families who share the love and spread the word about our cattery.",
   keywords: [
     "referral winners",
     "cat adoption community",
