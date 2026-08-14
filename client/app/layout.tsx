@@ -30,7 +30,7 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Premium Kittens for Loving Homes`,
+    default: `${SITE_NAME} | Premium Kittens for Loving Homes`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -55,21 +55,21 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — Premium Kittens for Loving Homes`,
+    title: `${SITE_NAME} | Premium Kittens for Loving Homes`,
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     locale: "en_US",
     images: [
       {
         url: `${SITE_URL}${OG_IMAGE}`,
-        alt: `${SITE_NAME} — Premium kittens raised in a loving home`,
+        alt: `${SITE_NAME} | Premium kittens raised in a loving home`,
         ...OG_IMAGE_DIMENSIONS,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — Premium Kittens for Loving Homes`,
+    title: `${SITE_NAME} | Premium Kittens for Loving Homes`,
     description: SITE_DESCRIPTION,
     images: [`${SITE_URL}${OG_IMAGE}`],
   },
