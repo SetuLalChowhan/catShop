@@ -1,31 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, ShieldCheck, Award, CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getData } from "@/lib/api";
-import { WebsiteContent } from "@/types";
+import { useContent } from "@/lib/queries";
 
 export default function AboutPage() {
-  const [content, setContent] = useState<WebsiteContent | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchContent() {
-      try {
-        const res = await getData<WebsiteContent>("/api/content");
-        if (res) setContent(res);
-      } catch (err) {
-        console.error("Failed to fetch CMS content:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchContent();
-  }, []);
+  // Cached — the about page reuses the shared content query.
+  const contentQuery = useContent();
+  const content = contentQuery.data ?? null;
+  const loading = contentQuery.isPending;
 
   const title = content?.about?.title || "Dedicated to Raising Healthy & Happy Companion Cats";
   const story = content?.about?.story || "Whisker Haven was founded out of a deep passion for cat welfare and ethical breeding standards. We raise purebred kittens inside our loving home environment rather than cages.";

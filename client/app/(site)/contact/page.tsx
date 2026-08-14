@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { getData, postData, apiErrorMessage } from "@/lib/api";
-import { ContactInfo, WebsiteContent } from "@/types";
+import { apiErrorMessage } from "@/lib/api";
+import { useContent, useCreateContact } from "@/lib/queries";
 import { safeExternalUrl } from "@/lib/format";
 import { ContactSkeleton } from "@/components/site/contact/ContactSkeleton";
 import { toast } from "sonner";
@@ -26,10 +26,13 @@ const contactSchema = z.object({
 type ContactFormValues = z.infer<typeof contactSchema>;
 
 export default function ContactPage() {
-  const [contact, setContact] = useState<ContactInfo | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Cached — contact details reuse the shared content query.
+  const contentQuery = useContent();
+  const contact = contentQuery.data?.contact ?? null;
+  const loading = contentQuery.isPending;
   const [submitting, setSubmitting] = useState(false);
   const [sentSuccess, setSentSuccess] = useState(false);
+  const createContact = useCreateContact();
 
   const {
     register,
@@ -39,20 +42,6 @@ export default function ContactPage() {
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
   });
-
-  useEffect(() => {
-    async function fetchContact() {
-      try {
-        const res = await getData<WebsiteContent>("/api/content");
-        if (res?.contact) setContact(res.contact);
-      } catch (err) {
-        console.error("Failed to fetch contact details:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchContact();
-  }, []);
 
   const phone = contact?.phone || "+1 (555) 234-5678";
   const email = contact?.email || "hello@whiskerhaven.com";
@@ -68,7 +57,7 @@ export default function ContactPage() {
   const onSubmit = async (data: ContactFormValues) => {
     try {
       setSubmitting(true);
-      await postData("/api/contacts", {
+      await createContact.mutateAsync({
         name: data.name,
         email: data.email,
         phone: data.phone || "",

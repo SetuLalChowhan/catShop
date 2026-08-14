@@ -12,7 +12,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 30 * 1000,
+            // Data stays fresh for 5 minutes, so navigating between pages
+            // (e.g. the admin dashboard) renders instantly from cache instead
+            // of flashing a loading state on every visit.
+            staleTime: 5 * 60 * 1000,
+            gcTime: 10 * 60 * 1000,
             retry: 1,
             refetchOnWindowFocus: false,
           },

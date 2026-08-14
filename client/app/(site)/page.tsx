@@ -1,50 +1,28 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import HeroBanner from "@/components/site/home/HeroBanner";
 import FeaturedCats from "@/components/site/home/FeaturedCats";
 import WinnerPreview from "@/components/site/home/WinnerPreview";
 import AboutPreview from "@/components/site/home/AboutPreview";
 import ContactBanner from "@/components/site/home/ContactBanner";
 import BookingModal from "@/components/site/booking/BookingModal";
-import { getData } from "@/lib/api";
-import { Cat, Winner, WebsiteContent } from "@/types";
+import { useCats, useWinners, useContent } from "@/lib/queries";
+import { Cat } from "@/types";
 
 export default function HomePage() {
-  const [cats, setCats] = useState<Cat[]>([]);
-  const [winners, setWinners] = useState<Winner[]>([]);
-  const [content, setContent] = useState<WebsiteContent | null>(null);
+  // All three are cached — returning to the home page (or any page sharing
+  // these endpoints) renders instantly from cache.
+  const catsQuery = useCats();
+  const winnersQuery = useWinners();
+  const contentQuery = useContent();
+
+  const cats = catsQuery.data ?? [];
+  const winners = winnersQuery.data ?? [];
+  const content = contentQuery.data ?? null;
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectedCat, setSelectedCat] = useState<Cat | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadHomeData() {
-      try {
-        const [catsRes, winnersRes, contentRes] = await Promise.allSettled([
-          getData<Cat[]>("/api/cats"),
-          getData<Winner[]>("/api/winners"),
-          getData<WebsiteContent>("/api/content"),
-        ]);
-
-        if (catsRes.status === "fulfilled" && Array.isArray(catsRes.value)) {
-          setCats(catsRes.value);
-        }
-        if (winnersRes.status === "fulfilled" && Array.isArray(winnersRes.value)) {
-          setWinners(winnersRes.value);
-        }
-        if (contentRes.status === "fulfilled" && contentRes.value) {
-          setContent(contentRes.value);
-        }
-      } catch (err) {
-        console.error("Error loading home page data:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadHomeData();
-  }, []);
+  const loading = catsQuery.isPending || winnersQuery.isPending || contentQuery.isPending;
 
   const handleBookCat = (cat: Cat) => {
     setSelectedCat(cat);

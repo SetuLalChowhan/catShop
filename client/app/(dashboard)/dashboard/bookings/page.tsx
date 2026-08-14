@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Search, Eye, Trash2, Calendar, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,50 +8,42 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { getData, patchData, deleteData, apiErrorMessage } from "@/lib/api";
+import { apiErrorMessage } from "@/lib/api";
+import {
+  useAdminBookings,
+  useDeleteBooking,
+  useUpdateBookingStatus,
+} from "@/lib/queries";
 import { Booking, BookingStatus } from "@/types";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { toast } from "sonner";
 
 export default function BookingManagementPage() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState<{ page: number; limit: number; total: number; pages: number } | null>(null);
 
   const [viewBooking, setViewBooking] = useState<Booking | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Booking | null>(null);
 
-  const fetchBookings = async (pageNum = page) => {
-    try {
-      setLoading(true);
-      const res = await getData<{ bookings: Booking[]; pagination?: { page: number; limit: number; total: number; pages: number } }>(
-        `/api/admin/bookings?page=${pageNum}&limit=10${statusFilter !== "all" ? `&status=${statusFilter}` : ""}${search ? `&search=${encodeURIComponent(search)}` : ""}`
-      );
-      if (Array.isArray(res)) {
-        setBookings(res);
-      } else if (res?.bookings) {
-        setBookings(res.bookings);
-        if (res.pagination) setPagination(res.pagination);
-      }
-    } catch (err) {
-      toast.error(apiErrorMessage(err, "Failed to fetch bookings"));
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Cached per page/status/search combination: switching sections or pages
+  // shows previously fetched data instantly instead of re-loading every time.
+  const bookingsQuery = useAdminBookings({ page, status: statusFilter, search });
+  const bookings = Array.isArray(bookingsQuery.data)
+    ? bookingsQuery.data
+    : bookingsQuery.data?.bookings ?? [];
+  const pagination = !Array.isArray(bookingsQuery.data)
+    ? (bookingsQuery.data?.pagination ?? null)
+    : null;
+  const loading = bookingsQuery.isPending;
 
-  useEffect(() => {
-    fetchBookings(page);
-  }, [page, statusFilter, search]);
+  const updateStatus = useUpdateBookingStatus();
+  const deleteBooking = useDeleteBooking();
 
   const handleStatusChange = async (id: string, newStatus: BookingStatus) => {
     try {
-      await patchData(`/api/bookings/${id}`, { status: newStatus });
+      await updateStatus.mutateAsync({ id, status: newStatus });
       toast.success(`Booking status updated to ${newStatus}`);
-      fetchBookings();
     } catch (err) {
       toast.error(apiErrorMessage(err, "Failed to update booking status"));
     }
@@ -60,10 +52,9 @@ export default function BookingManagementPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteData(`/api/bookings/${deleteTarget._id}`);
+      await deleteBooking.mutateAsync(deleteTarget._id);
       toast.success("Booking record deleted");
       setDeleteTarget(null);
-      fetchBookings();
     } catch (err) {
       toast.error(apiErrorMessage(err, "Failed to delete booking"));
     }

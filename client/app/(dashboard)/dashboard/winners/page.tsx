@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,7 +14,13 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { getData, postData, patchData, deleteData, apiErrorMessage } from "@/lib/api";
+import { apiErrorMessage } from "@/lib/api";
+import {
+  useAdminWinners,
+  useDeleteWinner,
+  useSaveWinner,
+  useToggleWinnerActive,
+} from "@/lib/queries";
 import { Winner, ImageAsset } from "@/types";
 import { toast } from "sonner";
 
@@ -29,15 +35,23 @@ const winnerSchema = z.object({
 type WinnerFormValues = z.infer<typeof winnerSchema>;
 
 export default function WinnerManagementPage() {
-  const [winners, setWinners] = useState<Winner[]>([]);
-  const [loading, setLoading] = useState(true);
-
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editWinner, setEditWinner] = useState<Winner | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Winner | null>(null);
 
   const [winnerImage, setWinnerImage] = useState<ImageAsset | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Cached query: revisiting the winners section renders instantly.
+  const winnersQuery = useAdminWinners();
+  const winners = Array.isArray(winnersQuery.data)
+    ? winnersQuery.data
+    : winnersQuery.data?.winners ?? [];
+  const loading = winnersQuery.isPending;
+
+  const saveWinner = useSaveWinner();
+  const deleteWinner = useDeleteWinner();
+  const toggleActive = useToggleWinnerActive();
 
   const {
     register,
@@ -56,26 +70,6 @@ export default function WinnerManagementPage() {
       isActive: true,
     },
   });
-
-  const fetchWinners = async () => {
-    try {
-      setLoading(true);
-      const res = await getData<{ winners?: Winner[] } | Winner[]>("/api/admin/winners");
-      if (Array.isArray(res)) {
-        setWinners(res);
-      } else if (res?.winners) {
-        setWinners(res.winners);
-      }
-    } catch (err) {
-      toast.error(apiErrorMessage(err, "Failed to fetch winners"));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchWinners();
-  }, []);
 
   const openAddModal = () => {
     reset({
@@ -101,20 +95,13 @@ export default function WinnerManagementPage() {
     setWinnerImage(winner.image || null);
   };
 
-  const toggleActive = async (winner: Winner) => {
+  const handleToggleActive = async (winner: Winner) => {
     const updatedStatus = !(winner.isActive !== false);
-    // Optimistic state update: Instant UI toggle, zero flicker
-    setWinners((prev) =>
-      prev.map((w) => (w._id === winner._id ? { ...w, isActive: updatedStatus } : w))
-    );
     try {
-      await patchData(`/api/winners/${winner._id}`, { isActive: updatedStatus });
+      // Optimistic UI update happens inside the mutation: instant toggle.
+      await toggleActive.mutateAsync({ id: winner._id, isActive: updatedStatus });
       toast.success(`Winner ${updatedStatus ? "enabled (visible on site)" : "disabled (hidden on site)"}`);
     } catch (err) {
-      // Revert if error
-      setWinners((prev) =>
-        prev.map((w) => (w._id === winner._id ? { ...w, isActive: !updatedStatus } : w))
-      );
       toast.error(apiErrorMessage(err, "Failed to toggle winner status"));
     }
   };
@@ -132,15 +119,14 @@ export default function WinnerManagementPage() {
     try {
       setSubmitting(true);
       if (editWinner) {
-        await patchData(`/api/winners/${editWinner._id}`, payload);
+        await saveWinner.mutateAsync({ id: editWinner._id, payload });
         toast.success("Winner record updated!");
         setEditWinner(null);
       } else {
-        await postData("/api/winners", payload);
+        await saveWinner.mutateAsync({ payload });
         toast.success("New winner added!");
         setAddModalOpen(false);
       }
-      fetchWinners();
     } catch (err) {
       toast.error(apiErrorMessage(err, "Failed to save winner record"));
     } finally {
@@ -151,10 +137,9 @@ export default function WinnerManagementPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteData(`/api/winners/${deleteTarget._id}`);
+      await deleteWinner.mutateAsync(deleteTarget._id);
       toast.success("Winner record deleted");
       setDeleteTarget(null);
-      fetchWinners();
     } catch (err) {
       toast.error(apiErrorMessage(err, "Failed to delete winner"));
     }
@@ -236,7 +221,7 @@ export default function WinnerManagementPage() {
                       <div className="flex items-center gap-2">
                         <Switch
                           checked={winner.isActive !== false}
-                          onCheckedChange={() => toggleActive(winner)}
+                          onCheckedChange={() => handleToggleActive(winner)}
                         />
                         <span className={`text-xs font-medium ${winner.isActive !== false ? "text-sage" : "text-muted-foreground"}`}>
                           {winner.isActive !== false ? "Enabled" : "Disabled"}

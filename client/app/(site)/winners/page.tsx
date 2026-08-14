@@ -1,32 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import { Trophy, ExternalLink, Star, Award, HeartHandshake } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import WinnerSkeleton from "@/components/site/winners/WinnerSkeleton";
-import { getData } from "@/lib/api";
-import { Winner } from "@/types";
+import { useWinners } from "@/lib/queries";
 
 export default function WinnersPage() {
-  const [winners, setWinners] = useState<Winner[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchWinners() {
-      try {
-        const data = await getData<Winner[]>("/api/winners");
-        if (Array.isArray(data)) {
-          setWinners(data.filter((w) => w.isActive !== false));
-        }
-      } catch (err) {
-        console.error("Failed to fetch winners:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchWinners();
-  }, []);
+  // Cached — revisiting the winners page renders instantly.
+  const winnersQuery = useWinners();
+  const winners = (winnersQuery.data ?? []).filter((w) => w.isActive !== false);
+  const loading = winnersQuery.isPending;
 
   if (loading) {
     return <WinnerSkeleton />;

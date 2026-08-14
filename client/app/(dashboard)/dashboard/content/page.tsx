@@ -19,8 +19,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { getData, patchData, apiErrorMessage } from "@/lib/api";
-import { WebsiteContent, ImageAsset } from "@/types";
+import { apiErrorMessage } from "@/lib/api";
+import { useContent, useSaveContent } from "@/lib/queries";
+import { ImageAsset } from "@/types";
 import { toast } from "sonner";
 
 const contentSchema = z.object({
@@ -59,7 +60,6 @@ const contentSchema = z.object({
 type ContentFormValues = z.infer<typeof contentSchema>;
 
 export default function FullCMSManagementPage() {
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   // Images state
@@ -76,53 +76,52 @@ export default function FullCMSManagementPage() {
     resolver: zodResolver(contentSchema),
   });
 
+  // Cached query: the CMS form is hydrated from cache on revisit — no reload.
+  const contentQuery = useContent();
+  const content = contentQuery.data;
+
   useEffect(() => {
-    async function fetchContent() {
-      try {
-        setLoading(true);
-        const res = await getData<WebsiteContent>("/api/content");
-        if (res) {
-          reset({
-            brandName: res.brand?.name || "Whisker Haven",
-            brandTagline: res.brand?.tagline || "Premium kittens, raised with love",
-            brandDescription: res.brand?.description || "",
-            announcementBar: res.brand?.announcementBar || "Ethical & Loving Cat Breeding • Reserve your purebred companion today",
-            footerText: res.brand?.footerText || "All kittens come fully vaccinated, health-checked, and microchipped before joining your home.",
+    if (!content) return;
+    // Hydrate the form from the (cached) content. Kept inside an async
+    // callback so the state updates flush after the effect body.
+    const hydrate = async () => {
+    reset({
+      brandName: content.brand?.name || "Whisker Haven",
+      brandTagline: content.brand?.tagline || "Premium kittens, raised with love",
+      brandDescription: content.brand?.description || "",
+      announcementBar: content.brand?.announcementBar || "Ethical & Loving Cat Breeding • Reserve your purebred companion today",
+      footerText: content.brand?.footerText || "All kittens come fully vaccinated, health-checked, and microchipped before joining your home.",
 
-            heroTitle: res.home?.heroTitle || "",
-            heroSubtitle: res.home?.heroSubtitle || "",
-            introText: res.home?.introText || "",
-            primaryCtaLabel: res.home?.primaryCta?.label || "Browse Available Cats",
-            secondaryCtaLabel: res.home?.secondaryCta?.label || "Submit Reservation Request",
-            catsSectionTitle: res.home?.catsSectionTitle || "Meet Our Available Companions",
-            catsSectionSubtitle: res.home?.catsSectionSubtitle || "Explore our current litter of health-checked, pedigreed kittens.",
-            winnersSectionTitle: res.home?.winnersSectionTitle || "Referral Winners & Recognition",
-            winnersSectionSubtitle: res.home?.winnersSectionSubtitle || "We celebrate our adopter community! Every month we reward top customer referrals.",
+      heroTitle: content.home?.heroTitle || "",
+      heroSubtitle: content.home?.heroSubtitle || "",
+      introText: content.home?.introText || "",
+      primaryCtaLabel: content.home?.primaryCta?.label || "Browse Available Cats",
+      secondaryCtaLabel: content.home?.secondaryCta?.label || "Submit Reservation Request",
+      catsSectionTitle: content.home?.catsSectionTitle || "Meet Our Available Companions",
+      catsSectionSubtitle: content.home?.catsSectionSubtitle || "Explore our current litter of health-checked, pedigreed kittens.",
+      winnersSectionTitle: content.home?.winnersSectionTitle || "Referral Winners & Recognition",
+      winnersSectionSubtitle: content.home?.winnersSectionSubtitle || "We celebrate our adopter community! Every month we reward top customer referrals.",
 
-            aboutTitle: res.about?.title || "",
-            aboutStory: res.about?.story || "",
-            aboutMission: res.about?.mission || "",
+      aboutTitle: content.about?.title || "",
+      aboutStory: content.about?.story || "",
+      aboutMission: content.about?.mission || "",
 
-            phone: res.contact?.phone || "",
-            email: res.contact?.email || "",
-            facebook: res.contact?.facebook || "",
-            messenger: res.contact?.messenger || "",
-            address: res.contact?.address || "",
-            hours: res.contact?.hours || "",
-          });
+      phone: content.contact?.phone || "",
+      email: content.contact?.email || "",
+      facebook: content.contact?.facebook || "",
+      messenger: content.contact?.messenger || "",
+      address: content.contact?.address || "",
+      hours: content.contact?.hours || "",
+    });
 
-          setLogoImage(res.brand?.logoImage || null);
-          setHeroImage(res.home?.heroImage || null);
-          setAboutImages(res.about?.images || []);
-        }
-      } catch (err) {
-        toast.error(apiErrorMessage(err, "Failed to load website content"));
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchContent();
-  }, [reset]);
+    setLogoImage(content.brand?.logoImage || null);
+    setHeroImage(content.home?.heroImage || null);
+    setAboutImages(content.about?.images || []);
+    };
+    hydrate();
+  }, [content, reset]);
+
+  const saveContent = useSaveContent();
 
   const onSubmit = async (data: ContentFormValues) => {
     const payload = {
@@ -164,7 +163,7 @@ export default function FullCMSManagementPage() {
 
     try {
       setSubmitting(true);
-      await patchData("/api/content", payload);
+      await saveContent.mutateAsync(payload);
       toast.success("All website content updated successfully!");
     } catch (err) {
       toast.error(apiErrorMessage(err, "Failed to save CMS content"));
@@ -178,7 +177,7 @@ export default function FullCMSManagementPage() {
     toast.error("Please check the form for invalid inputs");
   };
 
-  if (loading) {
+  if (contentQuery.isPending) {
     return <div className="p-12 text-center text-muted-foreground">Loading Full CMS Control Panel...</div>;
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,7 +23,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { getData, postData, patchData, deleteData, apiErrorMessage } from "@/lib/api";
+import { apiErrorMessage } from "@/lib/api";
+import {
+  useAdminCats,
+  useDeleteCat,
+  useSaveCat,
+  useToggleCatStatus,
+} from "@/lib/queries";
 import { Cat, ImageAsset } from "@/types";
 import { formatAge, capitalize } from "@/lib/format";
 import { toast } from "sonner";
@@ -45,8 +51,6 @@ const catFormSchema = z.object({
 type CatFormValues = z.infer<typeof catFormSchema>;
 
 export default function CatManagementPage() {
-  const [cats, setCats] = useState<Cat[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
 
@@ -84,8 +88,6 @@ export default function CatManagementPage() {
   });
 
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState<{ page: number; limit: number; total: number; pages: number } | null>(null);
-  const hasLoadedRef = useRef(false);
 
   // Debounced copy of the search box so we don't fire a request per keystroke.
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -94,78 +96,35 @@ export default function CatManagementPage() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const fetchCats = async (pageNum = page) => {
-    try {
-      // Only show the full-table loading state on the first load — later
-      // refetches (search, pagination, filters) update in place without flicker.
-      if (!hasLoadedRef.current) setLoading(true);
-      const res = await getData<{ cats: Cat[]; pagination?: { page: number; limit: number; total: number; pages: number } }>(
-        `/api/admin/cats?page=${pageNum}&limit=10${availabilityFilter !== "all" ? `&availability=${availabilityFilter}` : ""}${debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ""}`
-      );
-      if (Array.isArray(res)) {
-        setCats(res);
-      } else if (res?.cats) {
-        setCats(res.cats);
-        if (res.pagination) setPagination(res.pagination);
-      }
-      hasLoadedRef.current = true;
-    } catch (err) {
-      toast.error(apiErrorMessage(err, "Failed to load cats list"));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Reset to page 1 when a new search settles (the fetch effect below re-runs).
+  // Reset to page 1 when a new search settles (the query below re-runs).
   useEffect(() => {
     setPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
 
-  // Single fetch source of truth: page, availability, and debounced search.
-  // A request-sequence guard drops stale responses so an older, slower
-  // request can never overwrite newer results.
-  const requestSeq = useRef(0);
-  useEffect(() => {
-    const seq = ++requestSeq.current;
-    (async () => {
-      try {
-        if (!hasLoadedRef.current) setLoading(true);
-        const res = await getData<{ cats: Cat[]; pagination?: { page: number; limit: number; total: number; pages: number } }>(
-          `/api/admin/cats?page=${page}&limit=10${availabilityFilter !== "all" ? `&availability=${availabilityFilter}` : ""}${debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ""}`
-        );
-        if (seq !== requestSeq.current) return; // stale — ignore
-        if (Array.isArray(res)) {
-          setCats(res);
-        } else if (res?.cats) {
-          setCats(res.cats);
-          if (res.pagination) setPagination(res.pagination);
-        }
-        hasLoadedRef.current = true;
-      } catch (err) {
-        if (seq !== requestSeq.current) return;
-        toast.error(apiErrorMessage(err, "Failed to load cats list"));
-      } finally {
-        if (seq === requestSeq.current) setLoading(false);
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, availabilityFilter, debouncedSearch]);
+  // Cached query: page, availability, and debounced search each get their own
+  // cache entry, so revisiting a page/filter renders instantly and refetches
+  // in the background instead of flashing a full-table loading state.
+  const catsQuery = useAdminCats({
+    page,
+    availability: availabilityFilter,
+    search: debouncedSearch,
+  });
+  const cats = Array.isArray(catsQuery.data) ? catsQuery.data : catsQuery.data?.cats ?? [];
+  const pagination = !Array.isArray(catsQuery.data) ? (catsQuery.data?.pagination ?? null) : null;
+  const loading = catsQuery.isPending;
+
+  const saveCat = useSaveCat();
+  const deleteCat = useDeleteCat();
+  const toggleStatus = useToggleCatStatus();
 
   const toggleCatStatus = async (cat: Cat) => {
     const newStatus = cat.status === "active" ? "archived" : "active";
-    // Optimistic UI update: instant switch toggle with zero page flicker
-    setCats((prev) =>
-      prev.map((c) => (c._id === cat._id ? { ...c, status: newStatus } : c))
-    );
     try {
-      await patchData(`/api/cats/${cat._id}`, { status: newStatus });
+      // Optimistic UI update happens inside the mutation: instant switch toggle.
+      await toggleStatus.mutateAsync({ id: cat._id, status: newStatus });
       toast.success(`Cat listing ${newStatus === "active" ? "enabled (visible on site)" : "disabled (hidden on site)"}`);
     } catch (err) {
-      // Revert if error
-      setCats((prev) =>
-        prev.map((c) => (c._id === cat._id ? { ...c, status: cat.status } : c))
-      );
       toast.error(apiErrorMessage(err, "Failed to toggle cat status"));
     }
   };
@@ -234,15 +193,14 @@ export default function CatManagementPage() {
     try {
       setSubmitting(true);
       if (editCat) {
-        await patchData(`/api/cats/${editCat._id}`, payload);
+        await saveCat.mutateAsync({ id: editCat._id, payload });
         toast.success("Cat updated successfully!");
         setEditCat(null);
       } else {
-        await postData("/api/cats", payload);
+        await saveCat.mutateAsync({ payload });
         toast.success("New cat added successfully!");
         setAddModalOpen(false);
       }
-      fetchCats();
     } catch (err) {
       toast.error(apiErrorMessage(err, "Failed to save cat record"));
     } finally {
@@ -253,10 +211,9 @@ export default function CatManagementPage() {
   const handleDelete = async () => {
     if (!deleteCatTarget) return;
     try {
-      await deleteData(`/api/cats/${deleteCatTarget._id}`);
+      await deleteCat.mutateAsync(deleteCatTarget._id);
       toast.success("Cat deleted successfully!");
       setDeleteCatTarget(null);
-      fetchCats();
     } catch (err) {
       toast.error(apiErrorMessage(err, "Failed to delete cat"));
     }

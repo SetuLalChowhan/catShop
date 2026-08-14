@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Search, Filter, Cat as CatIcon, RefreshCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CatCard } from "@/components/site/cats/CatCard";
 import { CatGridSkeleton } from "@/components/site/cats/CatCardSkeleton";
 import BookingModal from "@/components/site/booking/BookingModal";
-import { getData } from "@/lib/api";
+import { useCats } from "@/lib/queries";
 import { Cat } from "@/types";
 
 export default function CatsPage() {
-  const [cats, setCats] = useState<Cat[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Cached — revisiting the cats page renders instantly.
+  const catsQuery = useCats();
+  const cats = catsQuery.data ?? [];
+  const loading = catsQuery.isPending;
   const [search, setSearch] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState<string>("all");
   const [breedFilter, setBreedFilter] = useState<string>("all");
@@ -22,22 +24,6 @@ export default function CatsPage() {
 
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectedCat, setSelectedCat] = useState<Cat | null>(null);
-
-  useEffect(() => {
-    async function fetchCats() {
-      try {
-        const data = await getData<Cat[]>("/api/cats");
-        if (Array.isArray(data)) {
-          setCats(data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch cats:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchCats();
-  }, []);
 
   // Unique breeds
   const breeds = useMemo(() => {

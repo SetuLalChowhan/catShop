@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Search, Eye, Trash2, Mail, Phone, MessageSquare, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,50 +8,41 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { getData, patchData, deleteData, apiErrorMessage } from "@/lib/api";
+import { apiErrorMessage } from "@/lib/api";
+import {
+  useAdminContacts,
+  useDeleteContact,
+  useUpdateContactStatus,
+} from "@/lib/queries";
 import { ContactMessage, ContactMessageStatus } from "@/types";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { toast } from "sonner";
 
 export default function ContactManagementPage() {
-  const [contacts, setContacts] = useState<ContactMessage[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState<{ page: number; limit: number; total: number; pages: number } | null>(null);
 
   const [viewContact, setViewContact] = useState<ContactMessage | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ContactMessage | null>(null);
 
-  const fetchContacts = async (pageNum = page) => {
-    try {
-      setLoading(true);
-      const res = await getData<{ contacts: ContactMessage[]; pagination?: { page: number; limit: number; total: number; pages: number } }>(
-        `/api/admin/contacts?page=${pageNum}&limit=10${statusFilter !== "all" ? `&status=${statusFilter}` : ""}${search ? `&search=${encodeURIComponent(search)}` : ""}`
-      );
-      if (Array.isArray(res)) {
-        setContacts(res);
-      } else if (res?.contacts) {
-        setContacts(res.contacts);
-        if (res.pagination) setPagination(res.pagination);
-      }
-    } catch (err) {
-      toast.error(apiErrorMessage(err, "Failed to fetch contact messages"));
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Cached per page/status/search combination — revisits render instantly.
+  const contactsQuery = useAdminContacts({ page, status: statusFilter, search });
+  const contacts = Array.isArray(contactsQuery.data)
+    ? contactsQuery.data
+    : contactsQuery.data?.contacts ?? [];
+  const pagination = !Array.isArray(contactsQuery.data)
+    ? (contactsQuery.data?.pagination ?? null)
+    : null;
+  const loading = contactsQuery.isPending;
 
-  useEffect(() => {
-    fetchContacts(page);
-  }, [page, statusFilter, search]);
+  const updateStatus = useUpdateContactStatus();
+  const deleteContact = useDeleteContact();
 
   const handleStatusChange = async (id: string, newStatus: ContactMessageStatus) => {
     try {
-      await patchData(`/api/admin/contacts/${id}`, { status: newStatus });
+      await updateStatus.mutateAsync({ id, status: newStatus });
       toast.success(`Message status updated to ${newStatus}`);
-      fetchContacts();
     } catch (err) {
       toast.error(apiErrorMessage(err, "Failed to update message status"));
     }
@@ -60,10 +51,9 @@ export default function ContactManagementPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteData(`/api/admin/contacts/${deleteTarget._id}`);
+      await deleteContact.mutateAsync(deleteTarget._id);
       toast.success("Contact message deleted");
       setDeleteTarget(null);
-      fetchContacts();
     } catch (err) {
       toast.error(apiErrorMessage(err, "Failed to delete contact message"));
     }

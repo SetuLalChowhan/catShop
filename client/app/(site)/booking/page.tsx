@@ -11,8 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getData, postData, apiErrorMessage } from "@/lib/api";
-import { Cat } from "@/types";
+import { apiErrorMessage } from "@/lib/api";
+import { useCats, useCreateBooking } from "@/lib/queries";
 import { toast } from "sonner";
 
 const bookingSchema = z.object({
@@ -30,9 +30,12 @@ function BookingContent() {
   const searchParams = useSearchParams();
   const catSlugParam = searchParams.get("cat");
 
-  const [cats, setCats] = useState<Cat[]>([]);
+  // Cached — the cat dropdown reuses the shared cats query.
+  const catsQuery = useCats();
+  const cats = catsQuery.data ?? [];
   const [submitting, setSubmitting] = useState(false);
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
+  const createBooking = useCreateBooking();
 
   const {
     register,
@@ -52,32 +55,22 @@ function BookingContent() {
     },
   });
 
+  // When arriving via ?cat=<slug>, preselect the matching cat once loaded.
   useEffect(() => {
-    async function fetchCats() {
-      try {
-        const data = await getData<Cat[]>("/api/cats");
-        if (Array.isArray(data)) {
-          setCats(data);
-          if (catSlugParam) {
-            const matched = data.find((c) => c.slug === catSlugParam);
-            if (matched) {
-              setValue("catId", matched._id);
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load cats:", err);
+    if (catSlugParam && cats.length > 0) {
+      const matched = cats.find((c) => c.slug === catSlugParam);
+      if (matched) {
+        setValue("catId", matched._id);
       }
     }
-    fetchCats();
-  }, [catSlugParam, setValue]);
+  }, [catSlugParam, cats, setValue]);
 
   const currentCatId = watch("catId");
 
   const onSubmit = async (data: BookingFormValues) => {
     try {
       setSubmitting(true);
-      await postData("/api/bookings", {
+      await createBooking.mutateAsync({
         customerName: data.customerName,
         email: data.email,
         phone: data.phone,

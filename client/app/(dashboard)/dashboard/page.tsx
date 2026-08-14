@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import {
   Cat as CatIcon,
@@ -15,42 +15,20 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getData } from "@/lib/api";
-import { DashboardStats, Booking, Cat } from "@/types";
+import { useAdminStats, useBookings, useCats } from "@/lib/queries";
 import { formatDate } from "@/lib/format";
 
 export default function DashboardOverviewPage() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [recentBookings, setRecentBookings] = useState<Booking[]>([]);
-  const [recentCats, setRecentCats] = useState<Cat[]>([]);
-  const [loading, setLoading] = useState(true);
+  // All three queries are cached by React Query, so revisiting the overview
+  // (or any dashboard section that shares these endpoints) renders instantly.
+  const statsQuery = useAdminStats();
+  const bookingsQuery = useBookings();
+  const catsQuery = useCats();
 
-  useEffect(() => {
-    async function fetchDashboardData() {
-      try {
-        const [statsRes, bookingsRes, catsRes] = await Promise.allSettled([
-          getData<DashboardStats>("/api/admin/stats"),
-          getData<Booking[]>("/api/bookings"),
-          getData<Cat[]>("/api/cats"),
-        ]);
-
-        if (statsRes.status === "fulfilled" && statsRes.value) {
-          setStats(statsRes.value);
-        }
-        if (bookingsRes.status === "fulfilled" && Array.isArray(bookingsRes.value)) {
-          setRecentBookings(bookingsRes.value.slice(0, 5));
-        }
-        if (catsRes.status === "fulfilled" && Array.isArray(catsRes.value)) {
-          setRecentCats(catsRes.value.slice(0, 5));
-        }
-      } catch (err) {
-        console.error("Failed to load dashboard stats:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchDashboardData();
-  }, []);
+  const stats = statsQuery.data ?? null;
+  const recentBookings = (bookingsQuery.data ?? []).slice(0, 5);
+  const recentCats = (catsQuery.data ?? []).slice(0, 5);
+  const loading = statsQuery.isPending || bookingsQuery.isPending || catsQuery.isPending;
 
   const bookingBadge = (status: string) => {
     switch (status) {
