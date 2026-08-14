@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, ShieldCheck, Heart, Award, Cat } from "lucide-react";
+import { ArrowRight, ShieldCheck, Heart, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WebsiteContent } from "@/types";
@@ -15,7 +15,7 @@ interface HeroBannerProps {
 }
 
 export function HeroBanner({ content, loading, onBookClick }: HeroBannerProps) {
-  if (loading || !content) {
+  if (loading) {
     return (
       <section className="relative pt-4 pb-12 sm:pt-8 sm:pb-16 lg:py-16 bg-background">
         <div className="container-site">

@@ -47,6 +47,28 @@ export async function serverFetch<T>(path: string, options?: RequestInit): Promi
   return unwrapApiData<T>(payload);
 }
 
+/**
+ * Cached variant for static/ISR server components — fetch fresh data from the
+ * backend at most every `revalidate` seconds, so public pages render real
+ * content in the initial HTML without hitting the API on every request.
+ */
+export async function serverFetchCached<T>(
+  path: string,
+  revalidate = 60,
+): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, {
+    next: { revalidate },
+  });
+
+  if (!res.ok) {
+    throw new Error(`API request failed: ${res.status}`);
+  }
+
+  const json = await res.json();
+  const payload = json?.data ?? json;
+  return unwrapApiData<T>(payload);
+}
+
 interface ApiResponse<T> {
   status: string;
   message?: string;

@@ -1,57 +1,59 @@
-"use client";
+import JsonLd from "@/components/seo/JsonLd";
+import { buildMetadata, webPageJsonLd } from "@/lib/seo";
+import { serverFetchCached } from "@/lib/api";
+import { Cat, WebsiteContent, Winner } from "@/types";
+import HomeClient from "./home-client";
 
-import React, { useState } from "react";
-import HeroBanner from "@/components/site/home/HeroBanner";
-import FeaturedCats from "@/components/site/home/FeaturedCats";
-import WinnerPreview from "@/components/site/home/WinnerPreview";
-import AboutPreview from "@/components/site/home/AboutPreview";
-import ContactBanner from "@/components/site/home/ContactBanner";
-import BookingModal from "@/components/site/booking/BookingModal";
-import { useCats, useWinners, useContent } from "@/lib/queries";
-import { Cat } from "@/types";
+export const revalidate = 60;
 
-export default function HomePage() {
-  // All three are cached — returning to the home page (or any page sharing
-  // these endpoints) renders instantly from cache.
-  const catsQuery = useCats();
-  const winnersQuery = useWinners();
-  const contentQuery = useContent();
+export const metadata = buildMetadata({
+  title: "Whisker Haven | Premium Kittens & Purebred Cats for Adoption",
+  titleAbsolute: true,
+  description:
+    "Whisker Haven is a family-run cattery raising healthy, vaccinated, and socialized purebred kittens in a loving home. Browse available kittens and reserve yours today.",
+  keywords: [
+    "purebred kittens for sale",
+    "cattery",
+    "kittens for adoption",
+    "ethical cat breeder",
+    "premium kitten cattery",
+  ],
+  path: "/",
+  robots: "index",
+});
 
-  const cats = catsQuery.data ?? [];
-  const winners = winnersQuery.data ?? [];
-  const content = contentQuery.data ?? null;
-  const [bookingOpen, setBookingOpen] = useState(false);
-  const [selectedCat, setSelectedCat] = useState<Cat | null>(null);
-  const loading = catsQuery.isPending || winnersQuery.isPending || contentQuery.isPending;
-
-  const handleBookCat = (cat: Cat) => {
-    setSelectedCat(cat);
-    setBookingOpen(true);
+async function getHomeData(): Promise<{
+  cats: Cat[];
+  winners: Winner[];
+  content: WebsiteContent | null;
+}> {
+  const [cats, winners, content] = await Promise.allSettled([
+    serverFetchCached<Cat[]>("/api/cats"),
+    serverFetchCached<Winner[]>("/api/winners"),
+    serverFetchCached<WebsiteContent>("/api/content"),
+  ]);
+  return {
+    cats: cats.status === "fulfilled" ? cats.value : [],
+    winners: winners.status === "fulfilled" ? winners.value : [],
+    content: content.status === "fulfilled" ? content.value : null,
   };
+}
 
-  const handleOpenGeneralBooking = () => {
-    setSelectedCat(null);
-    setBookingOpen(true);
-  };
+export default async function HomePage() {
+  const { cats, winners, content } = await getHomeData();
 
   return (
-    <div className="space-y-0">
-      <HeroBanner content={content} loading={loading} onBookClick={handleOpenGeneralBooking} />
-
-      <FeaturedCats cats={cats} loading={loading} onBookClick={handleBookCat} content={content} />
-
-      <WinnerPreview winners={winners} loading={loading} content={content} />
-
-      <AboutPreview content={content} loading={loading} />
-
-      <ContactBanner contact={content?.contact} />
-
-      <BookingModal
-        open={bookingOpen}
-        onOpenChange={setBookingOpen}
-        selectedCat={selectedCat}
-        catsList={cats}
+    <>
+      <JsonLd
+        data={webPageJsonLd({
+          path: "/",
+          name: "Whisker Haven — Premium Kittens & Purebred Cats for Adoption",
+          description:
+            "Whisker Haven is a family-run cattery raising healthy, vaccinated, and socialized purebred kittens in a loving home.",
+          type: "WebPage",
+        })}
       />
-    </div>
+      <HomeClient cats={cats} winners={winners} content={content} />
+    </>
   );
 }

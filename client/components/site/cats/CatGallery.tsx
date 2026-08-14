@@ -30,9 +30,12 @@ interface CatGalleryProps {
   name: string;
   /** Optional badges/overlays rendered on top of the main image. */
   overlay?: React.ReactNode;
+  /** Optional prefix used for image alt text (defaults to the cat name). */
+  altPrefix?: string;
 }
 
-export function CatGallery({ images, name, overlay }: CatGalleryProps) {
+export function CatGallery({ images, name, overlay, altPrefix }: CatGalleryProps) {
+  const altName = altPrefix || name;
   const [active, setActive] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [zooming, setZooming] = useState(false);
@@ -140,7 +143,7 @@ export function CatGallery({ images, name, overlay }: CatGalleryProps) {
             >
               <Image
                 src={img.url}
-                alt={`${name} photo ${idx + 1}`}
+                alt={`${altName} photo ${idx + 1}`}
                 fill
                 sizes="88px"
                 className="object-cover"
@@ -163,7 +166,7 @@ export function CatGallery({ images, name, overlay }: CatGalleryProps) {
           <Image
             key={mainImage.url}
             src={mainImage.url}
-            alt={`${name} photo ${active + 1}`}
+            alt={`${altName} photo ${active + 1}`}
             fill
             priority
             className="object-cover"
@@ -266,7 +269,7 @@ export function CatGallery({ images, name, overlay }: CatGalleryProps) {
               <Image
                 key={mainImage.url}
                 src={mainImage.url}
-                alt={`${name} photo ${active + 1}`}
+                alt={`${altName} photo ${active + 1}`}
                 fill
                 className="object-contain"
                 sizes="90vw"
@@ -303,7 +306,7 @@ export function CatGallery({ images, name, overlay }: CatGalleryProps) {
                 >
                   <Image
                     src={img.url}
-                    alt={`${name} photo ${idx + 1}`}
+                    alt={`${altName} photo ${idx + 1}`}
                     fill
                     sizes="64px"
                     className="object-cover"

@@ -14,7 +14,7 @@ interface AboutPreviewProps {
 }
 
 export function AboutPreview({ content, loading }: AboutPreviewProps) {
-  if (loading || !content) {
+  if (loading) {
     return (
       <section className="py-10 sm:py-16 bg-cream/30 border-t border-border/60">
         <div className="container-site">

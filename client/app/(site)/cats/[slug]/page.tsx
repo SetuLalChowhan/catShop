@@ -5,15 +5,15 @@ import {
   Calendar,
   Sparkles,
   ShieldCheck,
-  Award,
   Heart,
   ArrowLeft,
-  MessageCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import JsonLd from "@/components/seo/JsonLd";
 import { serverFetch } from "@/lib/api";
 import { formatAge, capitalize } from "@/lib/format";
+import { breadcrumbJsonLd, webPageJsonLd, absoluteUrl } from "@/lib/seo";
 import { CatGallery } from "@/components/site/cats/CatGallery";
 import { Cat } from "@/types";
 
@@ -23,11 +23,19 @@ interface PageProps {
 
 async function getCat(slug: string): Promise<Cat | null> {
   try {
-    const res = await serverFetch<{ data?: Cat; status?: string }>(`/api/cats/${slug}`);
-    return (res as any)?.data || (res as any);
-  } catch (err) {
+    // serverFetch already unwraps `{ data: { cat } }` into the Cat itself.
+    return await serverFetch<Cat>(`/api/cats/${slug}`);
+  } catch {
     return null;
   }
+}
+
+/** Build a concise meta description (~155 chars) from the cat's copy. */
+function catDescription(cat: Cat): string {
+  const source = cat.shortDescription || cat.description;
+  const trimmed = source.replace(/\s+/g, " ").trim();
+  if (trimmed.length <= 158) return trimmed;
+  return `${trimmed.slice(0, 155).trimEnd()}…`;
 }
 
 export async function generateMetadata({ params }: PageProps) {
@@ -36,19 +44,51 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!cat) {
     return {
-      title: "Cat Not Found | Whisker Haven",
+      title: "Cat Not Found",
+      description: "The kitten you are looking for could not be found.",
+      robots: { index: false, follow: false },
     };
   }
 
   const primaryImage = cat.images && cat.images.length > 0 ? cat.images[0].url : "";
+  const description = catDescription(cat);
+  const url = absoluteUrl(`/cats/${cat.slug}`);
 
   return {
-    title: `${cat.name} (${cat.breed}) | Available Kitten at Whisker Haven`,
-    description: cat.shortDescription || cat.description,
+    title: `${cat.name} — ${cat.breed} Kitten for Adoption`,
+    description,
+    keywords: [
+      cat.breed,
+      `${cat.breed} kitten`,
+      cat.name,
+      "purebred kitten",
+      "kittens for adoption",
+    ],
+    alternates: { canonical: url },
+    robots: { index: true, follow: true },
     openGraph: {
-      title: `${cat.name} — ${cat.breed}`,
-      description: cat.description,
-      images: primaryImage ? [{ url: primaryImage }] : [],
+      type: "website",
+      siteName: "Whisker Haven",
+      title: `${cat.name} — ${cat.breed} Kitten for Adoption`,
+      description,
+      url,
+      locale: "en_US",
+      images: primaryImage
+        ? [
+            {
+              url: primaryImage,
+              alt: `${cat.name}, ${cat.breed} kitten at Whisker Haven`,
+              width: 1200,
+              height: 1200,
+            },
+          ]
+        : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${cat.name} — ${cat.breed} Kitten for Adoption`,
+      description,
+      images: primaryImage ? [primaryImage] : [],
     },
   };
 }
@@ -81,6 +121,22 @@ export default async function CatDetailsPage({ params }: PageProps) {
   return (
     <div className="py-6 sm:py-10 bg-background">
       <div className="container-site space-y-6 sm:space-y-8">
+        <JsonLd
+          data={webPageJsonLd({
+            path: `/cats/${cat.slug}`,
+            name: `${cat.name} — ${cat.breed} Kitten for Adoption`,
+            description: catDescription(cat),
+            type: "WebPage",
+          })}
+        />
+        <JsonLd
+          data={breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Available Cats", path: "/cats" },
+            { name: cat.name, path: `/cats/${cat.slug}` },
+          ])}
+        />
+
         {/* Back Link */}
         <Link href="/cats" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to All Cats
@@ -92,6 +148,7 @@ export default async function CatDetailsPage({ params }: PageProps) {
             <CatGallery
               images={images}
               name={cat.name}
+              altPrefix={`${cat.name}, ${cat.breed}`}
               overlay={
                 <div className="flex flex-wrap gap-2">
                   {availabilityBadge()}
@@ -167,7 +224,7 @@ export default async function CatDetailsPage({ params }: PageProps) {
 
             {/* Description */}
             <div className="space-y-2">
-              <h3 className="font-display font-semibold text-base text-foreground">About {cat.name}</h3>
+              <h2 className="font-display font-semibold text-base text-foreground">About {cat.name}</h2>
               <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
                 {cat.description}
               </p>

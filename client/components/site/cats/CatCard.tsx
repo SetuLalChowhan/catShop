@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Cat } from "@/types";
 import { formatAge, capitalize } from "@/lib/format";
+import { catImageAlt } from "@/lib/seo";
 
 interface CatCardProps {
   cat: Cat;
@@ -50,7 +51,7 @@ export function CatCard({ cat, onBookClick }: CatCardProps) {
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
         <Image
           src={primaryImage}
-          alt={cat.name}
+          alt={catImageAlt(cat.name, cat.breed)}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import DashboardLayout from "@/layouts/DashboardLayout";
 import React from "react";
 
 interface Props {
@@ -9,8 +8,8 @@ interface Props {
 /** Private admin area — never indexed and excluded from the sitemap. */
 export const metadata: Metadata = {
   title: {
-    default: "Cattery Dashboard",
-    template: "%s | Cattery Dashboard",
+    default: "Admin Sign In",
+    template: "%s | Admin",
   },
   robots: {
     index: false,
@@ -23,12 +22,6 @@ export const metadata: Metadata = {
   },
 };
 
-const layout = ({ children }: Props) => {
-  return (
-    <DashboardLayout>
-      {children}
-    </DashboardLayout>
-  );
-};
-
-export default layout;
+export default function AdminLayout({ children }: Props) {
+  return <>{children}</>;
+}
