@@ -21,7 +21,7 @@ export function HeroBanner({ content, loading, onBookClick }: HeroBannerProps) {
         <div className="container-site">
           <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-center animate-pulse">
             <div className="w-full lg:col-span-5 order-1 lg:order-2">
-              <Skeleton className="aspect-[16/11] sm:aspect-[4/3] lg:aspect-[4/5] w-full rounded-2xl bg-muted/70 shadow-xs" />
+              <Skeleton className="aspect-[16/11] sm:aspect-[4/3] lg:aspect-[4/5] w-full rounded-xl bg-muted/70 shadow-xs" />
             </div>
 
             <div className="w-full lg:col-span-7 order-2 lg:order-1 space-y-5 sm:space-y-6">
@@ -59,7 +59,7 @@ export function HeroBanner({ content, loading, onBookClick }: HeroBannerProps) {
           
           {/* 1. Mobile First: Cat Image Showcase (Shown at top on mobile, right on desktop) */}
           <div className="w-full lg:col-span-5 order-1 lg:order-2">
-            <div className="relative aspect-[16/11] sm:aspect-[4/3] lg:aspect-[4/5] w-full rounded-2xl overflow-hidden border border-border shadow-lift bg-muted group">
+            <div className="relative aspect-[16/11] sm:aspect-[4/3] lg:aspect-[4/5] w-full rounded-xl overflow-hidden border border-border shadow-lift bg-muted group">
               <Image
                 src={heroImage}
                 alt="Whisker Haven Purebred Cat"
@@ -68,7 +68,6 @@ export function HeroBanner({ content, loading, onBookClick }: HeroBannerProps) {
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
                 sizes="(max-width: 1024px) 100vw, 45vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
               
               {/* Floating Badge over Image */}
               <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 p-3 sm:p-4 rounded-xl bg-background/90 backdrop-blur-md border border-border/60 shadow-md">

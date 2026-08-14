@@ -60,9 +60,9 @@ export default function HomePage() {
     <div className="space-y-0">
       <HeroBanner content={content} loading={loading} onBookClick={handleOpenGeneralBooking} />
 
-      <FeaturedCats cats={cats} loading={loading} onBookClick={handleBookCat} />
+      <FeaturedCats cats={cats} loading={loading} onBookClick={handleBookCat} content={content} />
 
-      <WinnerPreview winners={winners} loading={loading} />
+      <WinnerPreview winners={winners} loading={loading} content={content} />
 
       <AboutPreview content={content} loading={loading} />
 

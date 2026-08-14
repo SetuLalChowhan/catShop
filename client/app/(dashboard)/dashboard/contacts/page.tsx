@@ -139,7 +139,7 @@ export default function ContactManagementPage() {
       </div>
 
       {/* Data Table */}
-      <div className="bg-card rounded-2xl border border-border shadow-xs overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-muted-foreground">Loading contact messages...</div>
         ) : filteredContacts.length === 0 ? (
@@ -248,7 +248,7 @@ export default function ContactManagementPage() {
 
       {/* View Details Modal */}
       <Dialog open={!!viewContact} onOpenChange={(open) => !open && setViewContact(null)}>
-        <DialogContent className="sm:max-w-[550px] rounded-2xl">
+        <DialogContent className="sm:max-w-[550px] rounded-xl">
           <DialogHeader>
             <DialogTitle className="font-display text-xl font-bold">Contact Message</DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
@@ -301,7 +301,7 @@ export default function ContactManagementPage() {
 
       {/* Delete Confirmation Alert */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <AlertDialogContent className="rounded-2xl">
+        <AlertDialogContent className="rounded-xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete message from {deleteTarget?.name}?</AlertDialogTitle>
             <AlertDialogDescription>

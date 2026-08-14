@@ -179,7 +179,7 @@ export default function WinnerManagementPage() {
       </div>
 
       {/* List */}
-      <div className="bg-card rounded-2xl border border-border shadow-xs overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-muted-foreground">Loading winners list...</div>
         ) : winners.length === 0 ? (
@@ -261,7 +261,7 @@ export default function WinnerManagementPage() {
 
       {/* Add / Edit Dialog */}
       <Dialog open={addModalOpen || !!editWinner} onOpenChange={(open) => !open && (setAddModalOpen(false), setEditWinner(null))}>
-        <DialogContent className="sm:max-w-[500px] rounded-2xl">
+        <DialogContent className="sm:max-w-[500px] rounded-xl">
           <DialogHeader>
             <DialogTitle className="font-display text-xl font-bold">
               {editWinner ? "Edit Winner Record" : "Add New Referral Winner"}
@@ -341,7 +341,7 @@ export default function WinnerManagementPage() {
 
       {/* Delete Confirmation Alert */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <AlertDialogContent className="rounded-2xl">
+        <AlertDialogContent className="rounded-xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete winner record for {deleteTarget?.name}?</AlertDialogTitle>
             <AlertDialogDescription>

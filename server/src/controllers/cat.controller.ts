@@ -8,6 +8,9 @@ import type { AuthenticatedRequest } from "../types/index.js";
 
 const PUBLIC_LIST_FILTER = { status: "active" };
 
+/** Maximum number of images allowed per cat (matches client uploader). */
+const MAX_CAT_IMAGES = 8;
+
 /** GET /api/cats — public listing with optional filters & pagination. */
 export const getCats = catchAsync(
   async (req: AuthenticatedRequest, res: Response) => {
@@ -117,7 +120,7 @@ export const createCat = catchAsync(
       gender: body.gender,
       description: body.description,
       shortDescription: body.shortDescription || "",
-      images: (body.images as ImageAsset[]) || [],
+      images: ((body.images as ImageAsset[]) || []).slice(0, MAX_CAT_IMAGES),
       availability: body.availability || "available",
       status: body.status || "active",
       isFeatured: Boolean(body.isFeatured),
@@ -160,16 +163,25 @@ export const updateCat = catchAsync(
       cat.slug = slug;
     }
 
-    // Image replacement: delete Cloudinary assets that were removed.
+    // Image replacement: the client always sends the full desired set, so
+    // replace wholesale and clean up Cloudinary assets that were removed
+    // (avoids duplicates from merging the old list with the new one).
+    if (Array.isArray(body.images)) {
+      const nextImages = (body.images as ImageAsset[]).slice(0, MAX_CAT_IMAGES);
+      const nextIds = new Set(nextImages.map((img) => img.publicId));
+      const removed = cat.images.filter((img) => !nextIds.has(img.publicId));
+      cat.set("images", nextImages);
+      if (removed.length > 0) {
+        await Promise.all(removed.map((img) => deleteImage(img.publicId)));
+      }
+    }
+
+    // Legacy/backwards-compat: explicit publicId delete list.
     if (Array.isArray(body.deleteImages) && body.deleteImages.length > 0) {
       const toDelete = new Set<string>(body.deleteImages);
       const kept = cat.images.filter((img) => !toDelete.has(img.publicId));
       cat.set("images", kept);
       await Promise.all([...toDelete].map((publicId) => deleteImage(publicId)));
-    }
-    if (Array.isArray(body.images)) {
-      const merged = [...cat.images, ...(body.images as ImageAsset[])].slice(0, 6);
-      cat.set("images", merged);
     }
 
     await cat.save();

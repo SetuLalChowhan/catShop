@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Phone, Mail, MessageCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ContactInfo } from "@/types";
+import { safeExternalUrl } from "@/lib/format";
 
 interface ContactBannerProps {
   contact?: ContactInfo | null;
@@ -13,13 +14,13 @@ interface ContactBannerProps {
 export function ContactBanner({ contact }: ContactBannerProps) {
   const phone = contact?.phone || "+1 (555) 234-5678";
   const email = contact?.email || "hello@whiskerhaven.com";
-  const facebook = contact?.facebook || "https://facebook.com";
-  const messenger = contact?.messenger || "https://m.me";
+  const facebook = safeExternalUrl(contact?.facebook, "https://facebook.com");
+  const messenger = safeExternalUrl(contact?.messenger, "https://m.me");
 
   return (
     <section className="py-16 bg-primary/5 border-t border-border/60">
       <div className="container-site">
-        <div className="bg-card rounded-2xl border border-primary/20 p-8 md:p-12 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="bg-card rounded-xl border border-primary/20 p-8 md:p-12 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="space-y-3 text-center md:text-left max-w-xl">
             <span className="text-xs font-semibold uppercase tracking-wider text-primary">
               Have Questions or Ready to Reserve?

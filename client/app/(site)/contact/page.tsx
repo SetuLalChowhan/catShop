@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { getData, postData, apiErrorMessage } from "@/lib/api";
 import { ContactInfo, WebsiteContent } from "@/types";
+import { safeExternalUrl } from "@/lib/format";
 import { toast } from "sonner";
 
 const contactSchema = z.object({
@@ -51,8 +52,8 @@ export default function ContactPage() {
 
   const phone = contact?.phone || "+1 (555) 234-5678";
   const email = contact?.email || "hello@whiskerhaven.com";
-  const facebook = contact?.facebook || "https://facebook.com";
-  const messenger = contact?.messenger || "https://m.me";
+  const facebook = safeExternalUrl(contact?.facebook, "https://facebook.com");
+  const messenger = safeExternalUrl(contact?.messenger, "https://m.me");
   const address = contact?.address || "123 Whisker Way, Loving Home Cattery";
   const hours = contact?.hours || "Mon - Sun: 9:00 AM - 7:00 PM (Visits by appointment)";
 
@@ -148,7 +149,7 @@ export default function ContactPage() {
             </div>
 
             {/* Social Media Buttons */}
-            <div className="p-6 rounded-2xl bg-cream/50 border border-border space-y-4">
+            <div className="p-6 rounded-xl bg-cream/50 border border-border space-y-4">
               <h3 className="font-display font-semibold text-base text-foreground">Social & Instant Messaging</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Connect with us on social media for daily kitten photos, updates, and instant responses.
@@ -175,7 +176,7 @@ export default function ContactPage() {
           </div>
 
           {/* Form Right */}
-          <div className="lg:col-span-7 bg-card rounded-2xl border border-border p-6 md:p-8 shadow-xs">
+          <div className="lg:col-span-7 bg-card rounded-xl border border-border p-6 md:p-8 shadow-xs">
             <h2 className="font-display font-bold text-xl text-foreground mb-4">Send Us a Message</h2>
 
             {sentSuccess ? (

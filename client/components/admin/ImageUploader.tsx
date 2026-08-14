@@ -19,7 +19,7 @@ export function ImageUploader({
   value,
   onChange,
   multiple = false,
-  maxFiles = 5,
+  maxFiles = 8,
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
 
@@ -46,9 +46,8 @@ export function ImageUploader({
       }
 
       const endpoint = multiple ? "/api/admin/upload-multiple" : "/api/admin/upload";
-      const res = await api.post(endpoint, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // No manual Content-Type — the browser must set the multipart boundary.
+      const res = await api.post(endpoint, formData);
 
       const uploaded: ImageAsset | ImageAsset[] = res.data?.data;
 
@@ -113,20 +112,30 @@ export function ImageUploader({
 
       {/* Image Previews */}
       {images.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {images.map((img, idx) => (
-            <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-border group bg-muted">
-              <Image src={img.url} alt={`Uploaded ${idx + 1}`} fill className="object-cover" />
-              <button
-                type="button"
-                onClick={() => handleRemove(idx)}
-                className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white hover:bg-destructive transition-colors"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {images.map((img, idx) => (
+              <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-border group bg-muted">
+                <Image src={img.url} alt={`Uploaded ${idx + 1}`} fill className="object-cover" />
+                {multiple && idx === 0 && (
+                  <span className="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md bg-primary/90 text-primary-foreground text-[10px] font-semibold">
+                    Cover
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleRemove(idx)}
+                  className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white hover:bg-destructive transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {images.length} of {maxFiles} images — the first image is used as the cover photo on the site.
+          </p>
+        </>
       )}
     </div>
   );

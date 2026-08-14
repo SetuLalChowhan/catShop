@@ -1,12 +1,16 @@
 import type { Express } from "express";
 import { connectDB, db } from "../config/db.js";
 import { configureCloudinary } from "../config/cloudinary.js";
+import { configureDNS } from "../config/dns.js";
 import { runSeeds } from "../seeds/index.js";
 
 const PORT = process.env.PORT || 5000;
 
 export async function startApp(app: Express) {
   try {
+    // 0. DNS override (must run before any hostname resolution)
+    configureDNS();
+
     // 1. MongoDB connection
     await connectDB();
 

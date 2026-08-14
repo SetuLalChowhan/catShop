@@ -21,7 +21,7 @@ const baseFields = {
   isFeatured: z.boolean().optional().default(false),
   traits: z.array(z.string().max(40)).max(10).optional().default([]),
   pedigree: z.string().max(200).optional().default(""),
-  images: z.array(imageAssetSchema).max(6).optional(),
+  images: z.array(imageAssetSchema).max(8).optional(),
 };
 
 export const createCatSchema = z.object({

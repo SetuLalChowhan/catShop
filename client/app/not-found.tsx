@@ -10,7 +10,7 @@ export default function NotFound() {
     <div className="min-h-screen bg-paper flex flex-col items-center justify-center p-6 text-center">
       <div className="max-w-md w-full space-y-6">
         {/* Cat Illustration Badge */}
-        <div className="relative mx-auto w-24 h-24 rounded-3xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+        <div className="relative mx-auto w-24 h-24 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
           <Cat className="w-12 h-12" />
           <div className="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-xs">
             404

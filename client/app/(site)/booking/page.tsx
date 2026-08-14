@@ -112,7 +112,7 @@ function BookingContent() {
         </div>
 
         {submittedSuccess ? (
-          <div className="p-8 md:p-12 bg-card rounded-2xl border border-border shadow-xs text-center space-y-6 max-w-xl mx-auto">
+          <div className="p-8 md:p-12 bg-card rounded-xl border border-border shadow-xs text-center space-y-6 max-w-xl mx-auto">
             <div className="w-16 h-16 rounded-full bg-sage-soft text-sage flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-10 h-10" />
             </div>
@@ -136,7 +136,7 @@ function BookingContent() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Form */}
-            <div className="lg:col-span-8 bg-card rounded-2xl border border-border p-6 md:p-8 shadow-xs">
+            <div className="lg:col-span-8 bg-card rounded-xl border border-border p-6 md:p-8 shadow-xs">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 {/* Name */}
                 <div className="space-y-1.5">
@@ -197,7 +197,7 @@ function BookingContent() {
                     value={currentCatId}
                     onValueChange={(val) => setValue("catId", val, { shouldValidate: true })}
                   >
-                    <SelectTrigger className="rounded-lg">
+                    <SelectTrigger id="catId" className="rounded-lg">
                       <SelectValue placeholder="Select a cat from list..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -257,7 +257,7 @@ function BookingContent() {
 
             {/* Sidebar guarantee */}
             <div className="lg:col-span-4 space-y-4">
-              <div className="p-6 rounded-2xl bg-cream/50 border border-border space-y-4">
+              <div className="p-6 rounded-xl bg-cream/50 border border-border space-y-4">
                 <h3 className="font-display font-semibold text-lg text-foreground flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-sage" /> Cattery Assurance
                 </h3>

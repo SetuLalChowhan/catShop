@@ -129,7 +129,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* 1. Admin Email & Account Details */}
-      <div className="bg-card rounded-2xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
+      <div className="bg-card rounded-xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
         <div className="flex items-center gap-3 border-b border-border pb-4">
           <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
             <User className="w-5 h-5" />
@@ -164,7 +164,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* 2. Change Password */}
-      <div className="bg-card rounded-2xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
+      <div className="bg-card rounded-xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
         <div className="flex items-center gap-3 border-b border-border pb-4">
           <div className="w-10 h-10 rounded-xl bg-amber-soft text-amber-deep flex items-center justify-center">
             <KeyRound className="w-5 h-5" />
@@ -197,7 +197,7 @@ export default function AdminSettingsPage() {
           </div>
 
           <div className="pt-2 flex justify-end">
-            <Button type="submit" disabled={updatingPassword} className="rounded-xl gap-2 font-medium bg-amber-600 hover:bg-amber-700 text-white">
+            <Button type="submit" disabled={updatingPassword} className="rounded-xl gap-2 font-medium">
               {updatingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />} Update Password
             </Button>
           </div>

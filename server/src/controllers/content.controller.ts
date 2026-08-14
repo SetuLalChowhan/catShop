@@ -44,7 +44,18 @@ export const updateContent = catchAsync(
     if (body.brand) doc.set("brand", { ...brand, ...body.brand });
     if (body.home) doc.set("home", { ...home, ...body.home });
     if (body.about) doc.set("about", { ...about, ...body.about });
-    if (body.contact) doc.set("contact", { ...contact, ...body.contact });
+    if (body.contact) {
+      // Normalize social URLs so a missing protocol ("facebook.com/page")
+      // isn't stored and later rendered as a relative link.
+      const nextContact = { ...contact, ...body.contact };
+      for (const key of ["facebook", "messenger"] as const) {
+        const value = (nextContact[key] || "").trim();
+        if (value && !/^https?:\/\//i.test(value)) {
+          nextContact[key] = `https://${value}`;
+        }
+      }
+      doc.set("contact", nextContact);
+    }
 
     await doc.save();
 

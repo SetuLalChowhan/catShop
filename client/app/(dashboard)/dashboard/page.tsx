@@ -92,7 +92,7 @@ export default function DashboardOverviewPage() {
       {/* Stats Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Total Cats */}
-        <div className="bg-card rounded-2xl border border-border p-5 shadow-xs space-y-3">
+        <div className="bg-card rounded-xl border border-border p-5 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Total Cats
@@ -112,7 +112,7 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* Total Bookings */}
-        <div className="bg-card rounded-2xl border border-border p-5 shadow-xs space-y-3">
+        <div className="bg-card rounded-xl border border-border p-5 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Cat Bookings
@@ -132,7 +132,7 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* Contact Messages */}
-        <div className="bg-card rounded-2xl border border-border p-5 shadow-xs space-y-3">
+        <div className="bg-card rounded-xl border border-border p-5 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Contact Messages
@@ -152,7 +152,7 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* Confirmed Bookings */}
-        <div className="bg-card rounded-2xl border border-border p-5 shadow-xs space-y-3">
+        <div className="bg-card rounded-xl border border-border p-5 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Confirmed Bookings
@@ -172,7 +172,7 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* Total Winners */}
-        <div className="bg-card rounded-2xl border border-border p-5 shadow-xs space-y-3">
+        <div className="bg-card rounded-xl border border-border p-5 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Referral Winners
@@ -193,7 +193,7 @@ export default function DashboardOverviewPage() {
       {/* Recent Bookings & Inventory Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Recent Bookings */}
-        <div className="lg:col-span-7 bg-card rounded-2xl border border-border p-6 shadow-xs space-y-4">
+        <div className="lg:col-span-7 bg-card rounded-xl border border-border p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-display font-bold text-lg text-foreground">Recent Booking Inquiries</h2>
             <Link href="/dashboard/bookings" className="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
@@ -222,7 +222,7 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* Recent Cats Inventory */}
-        <div className="lg:col-span-5 bg-card rounded-2xl border border-border p-6 shadow-xs space-y-4">
+        <div className="lg:col-span-5 bg-card rounded-xl border border-border p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-display font-bold text-lg text-foreground">Cat Inventory Snapshot</h2>
             <Link href="/dashboard/cats" className="text-xs font-semibold text-primary hover:underline flex items-center gap-1">

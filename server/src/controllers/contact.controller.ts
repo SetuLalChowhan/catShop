@@ -98,6 +98,6 @@ export const deleteContact = catchAsync(
     const contact = await ContactModel.findByIdAndDelete(req.params.id);
     if (!contact) return next(new AppError("Contact message not found", 404));
 
-    res.status(204).json({ status: "success", data: null });
+    res.status(204).send();
   },
 );

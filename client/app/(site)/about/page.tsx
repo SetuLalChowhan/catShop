@@ -48,10 +48,10 @@ export default function AboutPage() {
               <Skeleton className="h-4 w-full bg-muted/50 rounded-md" />
               <Skeleton className="h-4 w-full bg-muted/50 rounded-md" />
               <Skeleton className="h-4 w-4/5 bg-muted/50 rounded-md" />
-              <Skeleton className="h-32 w-full rounded-2xl bg-muted/60" />
+              <Skeleton className="h-32 w-full rounded-xl bg-muted/60" />
             </div>
             <div className="lg:col-span-6">
-              <Skeleton className="w-full aspect-[4/3] rounded-2xl bg-muted/70" />
+              <Skeleton className="w-full aspect-[4/3] rounded-xl bg-muted/70" />
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@ export default function AboutPage() {
               {story}
             </p>
 
-            <div className="p-6 rounded-2xl bg-cream/50 border border-border space-y-3">
+            <div className="p-6 rounded-xl bg-cream/50 border border-border space-y-3">
               <h3 className="font-display font-bold text-lg text-foreground">Our Ethical Guarantee</h3>
               <ul className="space-y-2 text-xs text-muted-foreground">
                 <li className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export default function AboutPage() {
           </div>
 
           <div className="lg:col-span-6">
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-border shadow-lift bg-muted">
+            <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-border shadow-lift bg-muted">
               <Image
                 src={
                   images[0]?.url ||
@@ -119,7 +119,7 @@ export default function AboutPage() {
         </div>
 
         {/* Mission Banner */}
-        <div className="p-8 md:p-12 bg-card rounded-2xl border border-border shadow-xs text-center space-y-4 max-w-4xl mx-auto">
+        <div className="p-8 md:p-12 bg-card rounded-xl border border-border shadow-xs text-center space-y-4 max-w-4xl mx-auto">
           <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
             <Award className="w-6 h-6" />
           </div>

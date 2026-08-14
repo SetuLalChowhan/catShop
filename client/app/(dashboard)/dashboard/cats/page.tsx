@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -85,12 +85,22 @@ export default function CatManagementPage() {
 
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<{ page: number; limit: number; total: number; pages: number } | null>(null);
+  const hasLoadedRef = useRef(false);
+
+  // Debounced copy of the search box so we don't fire a request per keystroke.
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 350);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const fetchCats = async (pageNum = page) => {
     try {
-      setLoading(true);
+      // Only show the full-table loading state on the first load — later
+      // refetches (search, pagination, filters) update in place without flicker.
+      if (!hasLoadedRef.current) setLoading(true);
       const res = await getData<{ cats: Cat[]; pagination?: { page: number; limit: number; total: number; pages: number } }>(
-        `/api/admin/cats?page=${pageNum}&limit=10${availabilityFilter !== "all" ? `&availability=${availabilityFilter}` : ""}${search ? `&search=${encodeURIComponent(search)}` : ""}`
+        `/api/admin/cats?page=${pageNum}&limit=10${availabilityFilter !== "all" ? `&availability=${availabilityFilter}` : ""}${debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ""}`
       );
       if (Array.isArray(res)) {
         setCats(res);
@@ -98,6 +108,7 @@ export default function CatManagementPage() {
         setCats(res.cats);
         if (res.pagination) setPagination(res.pagination);
       }
+      hasLoadedRef.current = true;
     } catch (err) {
       toast.error(apiErrorMessage(err, "Failed to load cats list"));
     } finally {
@@ -105,9 +116,41 @@ export default function CatManagementPage() {
     }
   };
 
+  // Reset to page 1 when a new search settles (the fetch effect below re-runs).
   useEffect(() => {
-    fetchCats(page);
-  }, [page, availabilityFilter, search]);
+    setPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
+
+  // Single fetch source of truth: page, availability, and debounced search.
+  // A request-sequence guard drops stale responses so an older, slower
+  // request can never overwrite newer results.
+  const requestSeq = useRef(0);
+  useEffect(() => {
+    const seq = ++requestSeq.current;
+    (async () => {
+      try {
+        if (!hasLoadedRef.current) setLoading(true);
+        const res = await getData<{ cats: Cat[]; pagination?: { page: number; limit: number; total: number; pages: number } }>(
+          `/api/admin/cats?page=${page}&limit=10${availabilityFilter !== "all" ? `&availability=${availabilityFilter}` : ""}${debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ""}`
+        );
+        if (seq !== requestSeq.current) return; // stale — ignore
+        if (Array.isArray(res)) {
+          setCats(res);
+        } else if (res?.cats) {
+          setCats(res.cats);
+          if (res.pagination) setPagination(res.pagination);
+        }
+        hasLoadedRef.current = true;
+      } catch (err) {
+        if (seq !== requestSeq.current) return;
+        toast.error(apiErrorMessage(err, "Failed to load cats list"));
+      } finally {
+        if (seq === requestSeq.current) setLoading(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, availabilityFilter, debouncedSearch]);
 
   const toggleCatStatus = async (cat: Cat) => {
     const newStatus = cat.status === "active" ? "archived" : "active";
@@ -279,7 +322,7 @@ export default function CatManagementPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-card rounded-2xl border border-border shadow-xs overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-muted-foreground">Loading cat inventory...</div>
         ) : filteredCats.length === 0 ? (
@@ -410,7 +453,7 @@ export default function CatManagementPage() {
           }
         }}
       >
-        <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto rounded-2xl">
+        <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto rounded-xl">
           <DialogHeader>
             <DialogTitle className="font-display text-xl font-bold">
               {editCat ? `Edit Cat: ${editCat.name}` : "Add New Cat to Inventory"}
@@ -428,7 +471,7 @@ export default function CatManagementPage() {
                 value={uploadedImages}
                 onChange={(val) => setUploadedImages(Array.isArray(val) ? val : val ? [val] : [])}
                 multiple
-                maxFiles={6}
+                maxFiles={8}
               />
             </div>
 
@@ -529,7 +572,7 @@ export default function CatManagementPage() {
 
       {/* Delete Confirmation Alert */}
       <AlertDialog open={!!deleteCatTarget} onOpenChange={(open) => !open && setDeleteCatTarget(null)}>
-        <AlertDialogContent className="rounded-2xl">
+        <AlertDialogContent className="rounded-xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure you want to delete {deleteCatTarget?.name}?</AlertDialogTitle>
             <AlertDialogDescription>

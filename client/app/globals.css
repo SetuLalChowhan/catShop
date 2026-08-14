@@ -151,3 +151,13 @@
 @utility container-site {
   @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
 }
+
+/* Hide scrollbars while keeping native scrolling — used for horizontal
+   filter/segmented rows on narrow screens. */
+@utility scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

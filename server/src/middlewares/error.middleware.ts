@@ -38,34 +38,35 @@ const sendErrorProd = (err: AppError, res: Response) => {
   }
 };
 
+/**
+ * Normalise any thrown value into an AppError with the correct status code.
+ * Known client errors (invalid ObjectId, validation failures, duplicate
+ * keys, bad/expired JWT) map to friendly 4xx messages instead of leaking
+ * internal details as a 500.
+ */
+function normalizeError(err: unknown): AppError {
+  if (err instanceof AppError) return err;
+  if (err instanceof mongoose.Error.CastError) return handleCastError(err);
+  if (err instanceof mongoose.Error.ValidationError) return handleValidationError(err);
+  if ((err as { code?: number } | null)?.code === 11000) return handleDuplicateKey();
+  if (err instanceof Error && err.name === "JsonWebTokenError") return handleJWTError();
+  if (err instanceof Error && err.name === "TokenExpiredError") return handleJWTExpired();
+  if (err instanceof Error) return new AppError(err.message, 500);
+  return new AppError("Unknown error", 500);
+}
+
 export const errorMiddleware = (
   err: unknown,
   _req: Request,
   res: Response,
   _next: NextFunction,
 ) => {
-  let error: AppError;
-
-  if (err instanceof AppError) {
-    error = err;
-  } else if (err instanceof Error) {
-    error = new AppError(err.message, 500);
-  } else {
-    error = new AppError("Unknown error", 500);
-  }
+  const mapped = normalizeError(err);
 
   if (process.env.NODE_ENV === "development") {
-    sendErrorDev(error, res);
+    sendErrorDev(mapped, res);
     return;
   }
-
-  // Map known Mongoose/JWT errors to friendly messages in production.
-  let mapped: AppError = error;
-  if (err instanceof mongoose.Error.CastError) mapped = handleCastError(err);
-  else if (err instanceof mongoose.Error.ValidationError) mapped = handleValidationError(err);
-  else if ((err as { code?: number } | null)?.code === 11000) mapped = handleDuplicateKey();
-  else if (error.name === "JsonWebTokenError") mapped = handleJWTError();
-  else if (error.name === "TokenExpiredError") mapped = handleJWTExpired();
 
   sendErrorProd(mapped, res);
 };

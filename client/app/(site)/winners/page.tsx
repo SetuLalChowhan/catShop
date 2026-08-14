@@ -54,8 +54,8 @@ export default function WinnersPage() {
 
         {/* Winner of the Month Banner */}
         {winnerOfMonth && (
-          <div className="bg-card rounded-2xl border border-primary/30 p-8 shadow-lift max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8">
-            <div className="relative w-44 h-44 sm:w-56 sm:h-56 rounded-2xl overflow-hidden bg-muted border border-border shrink-0">
+          <div className="bg-card rounded-xl border border-primary/30 p-8 shadow-lift max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8">
+            <div className="relative w-44 h-44 sm:w-56 sm:h-56 rounded-xl overflow-hidden bg-muted border border-border shrink-0">
               <Image
                 src={
                   winnerOfMonth.image?.url ||
@@ -114,7 +114,7 @@ export default function WinnersPage() {
           {loading ? (
             <div className="p-8 text-center text-muted-foreground">Loading winners...</div>
           ) : winners.length === 0 ? (
-            <div className="p-12 text-center bg-card rounded-2xl border border-border">
+            <div className="p-12 text-center bg-card rounded-xl border border-border">
               <p className="text-sm text-muted-foreground">No referral winners listed yet.</p>
             </div>
           ) : (

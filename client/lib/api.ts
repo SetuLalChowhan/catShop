@@ -76,6 +76,25 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Expired/invalid session on admin calls → drop the stored session and
+    // send the admin back to the login page. Failed login attempts (401 on
+    // /api/auth/login) must NOT redirect — the form shows the error instead.
+    const status = error?.response?.status;
+    const url: string = error?.config?.url || "";
+    if (status === 401 && !url.includes("/api/auth/login") && typeof window !== "undefined") {
+      localStorage.removeItem("catshop_admin_user");
+      localStorage.removeItem("catshop_admin_token");
+      if (window.location.pathname.startsWith("/dashboard")) {
+        window.location.href = "/admin/login";
+      }
+    }
+    return Promise.reject(error);
+  },
+);
+
 export async function getData<T>(path: string): Promise<T> {
   const { data } = await api.get<ApiResponse<T>>(path);
   const payload = data?.data ?? data;

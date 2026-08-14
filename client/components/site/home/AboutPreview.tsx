@@ -20,7 +20,7 @@ export function AboutPreview({ content, loading }: AboutPreviewProps) {
         <div className="container-site">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center animate-pulse">
             <div className="lg:col-span-6">
-              <Skeleton className="aspect-[4/3] rounded-2xl bg-muted/70 w-full" />
+              <Skeleton className="aspect-[4/3] rounded-xl bg-muted/70 w-full" />
             </div>
             <div className="lg:col-span-6 space-y-4">
               <Skeleton className="h-5 w-36 bg-muted/60 rounded-full" />
@@ -47,7 +47,7 @@ export function AboutPreview({ content, loading }: AboutPreviewProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Image Collage */}
           <div className="lg:col-span-6 relative">
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-border shadow-lift bg-muted">
+            <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-border shadow-lift bg-muted">
               <Image
                 src={mainImage}
                 alt="About Whisker Haven Cattery"
@@ -56,7 +56,7 @@ export function AboutPreview({ content, loading }: AboutPreviewProps) {
               />
             </div>
             
-            <div className="absolute -bottom-6 -right-6 hidden sm:flex items-center gap-3 p-4 bg-card rounded-2xl border border-border shadow-md max-w-xs">
+            <div className="absolute -bottom-6 -right-6 hidden sm:flex items-center gap-3 p-4 bg-card rounded-xl border border-border shadow-md max-w-xs">
               <div className="w-10 h-10 rounded-xl bg-sage-soft text-sage flex items-center justify-center shrink-0">
                 <HeartHandshake className="w-6 h-6" />
               </div>

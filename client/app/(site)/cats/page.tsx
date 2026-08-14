@@ -119,83 +119,119 @@ export default function CatsPage() {
 
         {/* Filter Controls Bar */}
         <div className="bg-card border border-border rounded-xl p-4 shadow-xs space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
-            {/* Search */}
-            <div className="lg:col-span-4 relative">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
+            {/* Search — left, flexible width */}
+            <div className="relative flex-1 min-w-0">
               <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
               <Input
                 placeholder="Search by name, breed..."
+                aria-label="Search cats by name or breed"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9 rounded-lg"
               />
             </div>
 
-            {/* Breed Filter */}
-            <div className="lg:col-span-3">
-              <Select value={breedFilter} onValueChange={setBreedFilter}>
-                <SelectTrigger className="rounded-lg">
-                  <SelectValue placeholder="All Breeds" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Breeds ({breeds.length})</SelectItem>
-                  {breeds.map((breed) => (
-                    <SelectItem key={breed} value={breed}>
-                      {breed}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Breed + Gender + Reset — grouped together on the right */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 lg:gap-2.5 shrink-0">
+              {/* Breed Filter */}
+              <div className="sm:w-44">
+                <Select value={breedFilter} onValueChange={setBreedFilter}>
+                  <SelectTrigger className="rounded-lg">
+                    <SelectValue placeholder="All Breeds" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Breeds ({breeds.length})</SelectItem>
+                    {breeds.map((breed) => (
+                      <SelectItem key={breed} value={breed}>
+                        {breed}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Gender Filter */}
-            <div className="lg:col-span-3">
-              <Select value={genderFilter} onValueChange={setGenderFilter}>
-                <SelectTrigger className="rounded-lg">
-                  <SelectValue placeholder="All Genders" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Genders</SelectItem>
-                  <SelectItem value="male">Male ♂</SelectItem>
-                  <SelectItem value="female">Female ♀</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              {/* Gender Filter */}
+              <div className="sm:w-40">
+                <Select value={genderFilter} onValueChange={setGenderFilter}>
+                  <SelectTrigger className="rounded-lg">
+                    <SelectValue placeholder="All Genders" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Genders</SelectItem>
+                    <SelectItem value="male">Male ♂</SelectItem>
+                    <SelectItem value="female">Female ♀</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Reset */}
-            <div className="lg:col-span-2">
+              {/* Reset */}
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
-                className="w-full rounded-lg gap-1.5 text-xs font-medium"
+                className="w-full sm:w-auto rounded-lg gap-1.5 text-xs font-medium h-9"
               >
                 <RefreshCw className="w-3.5 h-3.5" /> Reset Filters
               </Button>
             </div>
           </div>
 
-          {/* Availability Tabs */}
-          <div className="pt-2 border-t border-border/60 flex items-center justify-between">
-            <Tabs value={availabilityFilter} onValueChange={setAvailabilityFilter} className="w-full sm:w-auto">
-              <TabsList className="bg-muted p-1 rounded-lg">
-                <TabsTrigger value="all" className="text-xs px-3 py-1">
-                  All ({cats.length})
-                </TabsTrigger>
-                <TabsTrigger value="available" className="text-xs px-3 py-1">
-                  Available ({cats.filter((c) => c.availability === "available").length})
-                </TabsTrigger>
-                <TabsTrigger value="reserved" className="text-xs px-3 py-1">
-                  Reserved ({cats.filter((c) => c.availability === "reserved").length})
-                </TabsTrigger>
-                <TabsTrigger value="sold" className="text-xs px-3 py-1">
-                  Adopted ({cats.filter((c) => c.availability === "sold").length})
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+          {/* Availability Filters — horizontally scrollable segmented control */}
+          <div className="pt-4 border-t border-border/60">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hidden -mx-1 px-1 py-0.5 touch-pan-x">
+                <Tabs value={availabilityFilter} onValueChange={setAvailabilityFilter}>
+                  <TabsList className="w-max bg-muted/70 p-1 rounded-full gap-1">
+                    {[
+                      { value: "all", label: "All", count: cats.length },
+                      {
+                        value: "available",
+                        label: "Available",
+                        count: cats.filter((c) => c.availability === "available").length,
+                      },
+                      {
+                        value: "reserved",
+                        label: "Reserved",
+                        count: cats.filter((c) => c.availability === "reserved").length,
+                      },
+                      {
+                        value: "sold",
+                        label: "Adopted",
+                        count: cats.filter((c) => c.availability === "sold").length,
+                      },
+                    ].map((tab) => {
+                      const active = availabilityFilter === tab.value;
+                      return (
+                        <TabsTrigger
+                          key={tab.value}
+                          value={tab.value}
+                          className="rounded-full px-4 py-1.5 text-xs font-semibold gap-1.5 transition-all duration-200 text-muted-foreground hover:text-ink active:scale-[0.97] data-[state=active]:bg-white data-[state=active]:text-ink data-[state=active]:shadow-md"
+                        >
+                          {tab.label}
+                          <span
+                            className={`inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-[10px] font-bold tabular-nums transition-colors ${active
+                                ? "bg-muted text-muted-foreground"
+                                : "bg-card/80 text-muted-foreground shadow-xs"
+                              }`}
+                          >
+                            {tab.count}
+                          </span>
+                        </TabsTrigger>
+                      );
+                    })}
+                  </TabsList>
+                </Tabs>
+              </div>
 
-            <span className="hidden sm:inline text-xs text-muted-foreground font-medium">
+              <span className="hidden md:inline-flex shrink-0 text-xs text-muted-foreground font-medium whitespace-nowrap">
+                Showing {filteredCats.length} result{filteredCats.length === 1 ? "" : "s"}
+              </span>
+            </div>
+
+            {/* Result count on small screens (below the scrollable pills) */}
+            <p className="md:hidden mt-2 text-xs text-muted-foreground font-medium">
               Showing {filteredCats.length} result{filteredCats.length === 1 ? "" : "s"}
-            </span>
+            </p>
           </div>
         </div>
 
@@ -203,7 +239,7 @@ export default function CatsPage() {
         {loading ? (
           <CatGridSkeleton count={6} />
         ) : filteredCats.length === 0 ? (
-          <div className="py-16 text-center bg-card rounded-2xl border border-border p-8 space-y-3">
+          <div className="py-16 text-center bg-card rounded-xl border border-border p-8 space-y-3">
             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto text-muted-foreground">
               <Filter className="w-6 h-6" />
             </div>

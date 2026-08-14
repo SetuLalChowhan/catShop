@@ -102,7 +102,7 @@ export function BookingModal({ open, onOpenChange, selectedCat, catsList = [] }:
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[520px] rounded-2xl bg-card p-6 border-border">
+      <DialogContent className="sm:max-w-[520px] rounded-xl bg-card p-6 border-border">
         <DialogHeader>
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
             <Heart className="w-5 h-5 fill-primary/20" />
@@ -190,7 +190,7 @@ export function BookingModal({ open, onOpenChange, selectedCat, catsList = [] }:
                 value={currentCatId}
                 onValueChange={(val) => setValue("catId", val, { shouldValidate: true })}
               >
-                <SelectTrigger className="rounded-lg">
+                <SelectTrigger id="catSelect" className="rounded-lg">
                   <SelectValue placeholder="Choose a kitten..." />
                 </SelectTrigger>
                 <SelectContent>

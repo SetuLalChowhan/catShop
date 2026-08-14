@@ -23,15 +23,15 @@ export default function SiteLoading() {
 
           {/* Banner Image Skeleton */}
           <div className="lg:col-span-5">
-            <Skeleton className="w-full aspect-[4/3] rounded-2xl bg-muted/70 shadow-xs" />
+            <Skeleton className="w-full aspect-[4/3] rounded-xl bg-muted/70 shadow-xs" />
           </div>
         </div>
 
         {/* Feature Pills / Cards Skeleton */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-border/60">
-          <Skeleton className="h-24 rounded-2xl bg-muted/50" />
-          <Skeleton className="h-24 rounded-2xl bg-muted/50" />
-          <Skeleton className="h-24 rounded-2xl bg-muted/50" />
+          <Skeleton className="h-24 rounded-xl bg-muted/50" />
+          <Skeleton className="h-24 rounded-xl bg-muted/50" />
+          <Skeleton className="h-24 rounded-xl bg-muted/50" />
         </div>
       </div>
     </div>

@@ -139,7 +139,7 @@ export default function BookingManagementPage() {
       </div>
 
       {/* Data Table */}
-      <div className="bg-card rounded-2xl border border-border shadow-xs overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-muted-foreground">Loading bookings...</div>
         ) : filteredBookings.length === 0 ? (
@@ -257,7 +257,7 @@ export default function BookingManagementPage() {
 
       {/* View Details Modal */}
       <Dialog open={!!viewBooking} onOpenChange={(open) => !open && setViewBooking(null)}>
-        <DialogContent className="sm:max-w-[500px] rounded-2xl">
+        <DialogContent className="sm:max-w-[500px] rounded-xl">
           <DialogHeader>
             <DialogTitle className="font-display text-xl font-bold">Booking Details</DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
@@ -306,7 +306,7 @@ export default function BookingManagementPage() {
 
       {/* Delete Confirmation Alert */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <AlertDialogContent className="rounded-2xl">
+        <AlertDialogContent className="rounded-xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete booking for {deleteTarget?.customerName}?</AlertDialogTitle>
             <AlertDialogDescription>

@@ -19,7 +19,7 @@ export default function ErrorPage({
   return (
     <div className="min-h-[70vh] bg-paper flex flex-col items-center justify-center p-6 text-center">
       <div className="max-w-md w-full space-y-6">
-        <div className="w-16 h-16 rounded-2xl bg-destructive/10 text-destructive flex items-center justify-center mx-auto shadow-xs">
+        <div className="w-16 h-16 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center mx-auto shadow-xs">
           <AlertTriangle className="w-8 h-8" />
         </div>
 

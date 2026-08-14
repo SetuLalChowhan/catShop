@@ -68,7 +68,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md space-y-6">
         {/* Logo Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center mx-auto shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center mx-auto shadow-sm">
             <Cat className="w-7 h-7" />
           </div>
           <h1 className="font-display font-extrabold text-2xl text-foreground">
@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
+        <div className="bg-card border border-border rounded-xl p-6 md:p-8 shadow-sm space-y-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-xs font-semibold">

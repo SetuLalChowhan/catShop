@@ -6,16 +6,21 @@ import { ArrowRight, Cat as CatIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CatCard } from "@/components/site/cats/CatCard";
 import { CatGridSkeleton } from "@/components/site/cats/CatCardSkeleton";
-import { Cat } from "@/types";
+import { Cat, WebsiteContent } from "@/types";
 
 interface FeaturedCatsProps {
   cats: Cat[];
   loading?: boolean;
   onBookClick: (cat: Cat) => void;
+  content?: WebsiteContent | null;
 }
 
-export function FeaturedCats({ cats, loading = false, onBookClick }: FeaturedCatsProps) {
+export function FeaturedCats({ cats, loading = false, onBookClick, content }: FeaturedCatsProps) {
   const featured = cats.filter((c) => c.status === "active").slice(0, 6);
+  const sectionTitle = content?.home?.catsSectionTitle || "Meet Our Available Companions";
+  const sectionSubtitle =
+    content?.home?.catsSectionSubtitle ||
+    "Explore our current litter of health-checked, pedigreed kittens. Each cat is raised with individual love and preparation for their forever home.";
 
   return (
     <section className="py-16 bg-cream/50 border-y border-border/60">
@@ -28,10 +33,10 @@ export function FeaturedCats({ cats, loading = false, onBookClick }: FeaturedCat
               <span>Kittens & Cats Available</span>
             </div>
             <h2 className="font-display font-bold text-3xl sm:text-4xl text-ink">
-              Meet Our Available Companions
+              {sectionTitle}
             </h2>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Explore our current litter of health-checked, pedigreed kittens. Each cat is raised with individual love and preparation for their forever home.
+              {sectionSubtitle}
             </p>
           </div>
 
@@ -46,7 +51,7 @@ export function FeaturedCats({ cats, loading = false, onBookClick }: FeaturedCat
         {loading ? (
           <CatGridSkeleton count={6} />
         ) : featured.length === 0 ? (
-          <div className="p-12 text-center bg-card rounded-2xl border border-border space-y-3">
+          <div className="p-12 text-center bg-card rounded-xl border border-border space-y-3">
             <p className="text-lg font-medium text-foreground">No cats currently available.</p>
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
               We are expecting new litters soon. Feel free to contact us or submit a general booking inquiry to get on our waiting list.

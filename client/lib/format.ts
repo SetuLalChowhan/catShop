@@ -17,6 +17,21 @@ export function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+/**
+ * Ensure an external URL starts with a protocol so the browser doesn't treat
+ * it as a relative path (e.g. "facebook.com/page" → "https://facebook.com/page").
+ * Returns the fallback when the value is empty.
+ */
+export function safeExternalUrl(
+  url: string | null | undefined,
+  fallback = "",
+): string {
+  const value = (url || "").trim();
+  if (!value) return fallback;
+  if (/^https?:\/\//i.test(value)) return value;
+  return `https://${value}`;
+}
+
 export function formatDate(value: string | Date | null | undefined): string {
   if (!value) return "—";
   return new Date(value).toLocaleDateString("en-US", {

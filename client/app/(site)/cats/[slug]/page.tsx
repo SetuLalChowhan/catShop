@@ -1,6 +1,4 @@
 import React from "react";
-import Metadata from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -16,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { serverFetch } from "@/lib/api";
 import { formatAge, capitalize } from "@/lib/format";
+import { CatGallery } from "@/components/site/cats/CatGallery";
 import { Cat } from "@/types";
 
 interface PageProps {
@@ -88,37 +87,22 @@ export default async function CatDetailsPage({ params }: PageProps) {
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Left Column: Image Gallery */}
-          <div className="lg:col-span-7 space-y-4">
-            <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden border border-border shadow-lift bg-muted">
-              <Image
-                src={images[0].url}
-                alt={cat.name}
-                fill
-                priority
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 55vw"
-              />
-              <div className="absolute top-4 left-4 flex gap-2">
-                {availabilityBadge()}
-                {cat.isFeatured && (
-                  <Badge className="bg-primary text-primary-foreground font-medium flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5" /> Featured
-                  </Badge>
-                )}
-              </div>
-            </div>
-
-            {/* Thumbnail selector gallery if multiple images */}
-            {images.length > 1 && (
-              <div className="grid grid-cols-4 gap-3">
-                {images.map((img, idx) => (
-                  <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-border bg-muted cursor-pointer hover:opacity-90">
-                    <Image src={img.url} alt={`${cat.name} photo ${idx + 1}`} fill className="object-cover" />
-                  </div>
-                ))}
-              </div>
-            )}
+          {/* Left Column: Image Gallery (hover zoom + click to open lightbox) */}
+          <div className="lg:col-span-7">
+            <CatGallery
+              images={images}
+              name={cat.name}
+              overlay={
+                <div className="flex flex-wrap gap-2">
+                  {availabilityBadge()}
+                  {cat.isFeatured && (
+                    <Badge className="bg-primary text-primary-foreground font-medium flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5" /> Featured
+                    </Badge>
+                  )}
+                </div>
+              }
+            />
           </div>
 
           {/* Right Column: Cat Details & Booking Sidebar */}

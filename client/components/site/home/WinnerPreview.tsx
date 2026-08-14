@@ -6,14 +6,19 @@ import Image from "next/image";
 import { Trophy, ExternalLink, ArrowRight, Award, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Winner } from "@/types";
+import { Winner, WebsiteContent } from "@/types";
 
 interface WinnerPreviewProps {
   winners: Winner[];
   loading?: boolean;
+  content?: WebsiteContent | null;
 }
 
-export function WinnerPreview({ winners, loading }: WinnerPreviewProps) {
+export function WinnerPreview({ winners, loading, content }: WinnerPreviewProps) {
+  const sectionTitle = content?.home?.winnersSectionTitle || "Referral Winners & Recognition";
+  const sectionSubtitle =
+    content?.home?.winnersSectionSubtitle ||
+    "We celebrate our adopter community! Every month we reward top customer referrals and showcase our cat parent spotlight winners.";
   if (loading) {
     return (
       <section className="py-16 bg-background">
@@ -25,12 +30,12 @@ export function WinnerPreview({ winners, loading }: WinnerPreviewProps) {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center animate-pulse">
-            <div className="lg:col-span-7 bg-card rounded-2xl border border-border p-6 md:p-8 space-y-4">
-              <Skeleton className="w-36 h-36 rounded-2xl bg-muted/70 mx-auto md:mx-0" />
+            <div className="lg:col-span-7 bg-card rounded-xl border border-border p-6 md:p-8 space-y-4">
+              <Skeleton className="w-36 h-36 rounded-xl bg-muted/70 mx-auto md:mx-0" />
               <Skeleton className="h-6 w-48 bg-muted/80 rounded-md" />
               <Skeleton className="h-4 w-full bg-muted/50 rounded-md" />
             </div>
-            <div className="lg:col-span-5 bg-cream/40 rounded-2xl border border-border p-6 space-y-4">
+            <div className="lg:col-span-5 bg-cream/40 rounded-xl border border-border p-6 space-y-4">
               <Skeleton className="h-6 w-36 bg-muted/70 rounded-md" />
               <Skeleton className="h-12 w-full bg-muted/50 rounded-xl" />
               <Skeleton className="h-12 w-full bg-muted/50 rounded-xl" />
@@ -42,7 +47,9 @@ export function WinnerPreview({ winners, loading }: WinnerPreviewProps) {
   }
 
   const winnerOfMonth = winners.find((w) => w.isWinnerOfMonth) || winners[0];
-  const referralWinners = winners.slice(0, 3);
+  const referralWinners = winners
+    .filter((w) => w._id !== winnerOfMonth?._id)
+    .slice(0, 3);
 
   return (
     <section className="py-16 bg-background">
@@ -54,18 +61,18 @@ export function WinnerPreview({ winners, loading }: WinnerPreviewProps) {
             <span>Community & Referrals</span>
           </div>
           <h2 className="font-display font-bold text-3xl sm:text-4xl text-ink">
-            Referral Winners & Recognition
+            {sectionTitle}
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            We celebrate our adopter community! Every month we reward top customer referrals and showcase our cat parent spotlight winners.
+            {sectionSubtitle}
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Winner of the Month Spotlight */}
           {winnerOfMonth && (
-            <div className="lg:col-span-7 bg-card rounded-2xl border border-border p-6 md:p-8 shadow-xs flex flex-col md:flex-row gap-6 items-center">
-              <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-2xl overflow-hidden bg-muted border border-border shrink-0">
+            <div className="lg:col-span-7 bg-card rounded-xl border border-border p-6 md:p-8 shadow-xs flex flex-col md:flex-row gap-6 items-center">
+              <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-xl overflow-hidden bg-muted border border-border shrink-0">
                 <Image
                   src={
                     winnerOfMonth.image?.url ||
@@ -105,7 +112,7 @@ export function WinnerPreview({ winners, loading }: WinnerPreviewProps) {
           )}
 
           {/* Referral List */}
-          <div className="lg:col-span-5 bg-cream/40 rounded-2xl border border-border p-6 space-y-4">
+          <div className="lg:col-span-5 bg-cream/40 rounded-xl border border-border p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h4 className="font-display font-bold text-lg text-foreground flex items-center gap-2">
                 <Award className="w-5 h-5 text-primary" /> Top Referral Winners

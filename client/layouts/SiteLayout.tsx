@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { Cat, Menu, X, Phone, Mail, MessageCircle, ArrowRight, Heart } from "lucide-react";
+import { Cat, Menu, Phone, Mail, MessageCircle, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MobileDrawer } from "@/components/site/MobileDrawer";
 import { SITE } from "@/lib/site";
 import { getData } from "@/lib/api";
 import { WebsiteContent } from "@/types";
@@ -61,18 +62,18 @@ export function SiteLayout({ children }: SiteLayoutProps) {
     <div className="min-h-screen flex flex-col bg-background text-foreground font-sans antialiased">
       {/* Top Announcement Bar */}
       <div className="bg-primary/10 border-b border-primary/15 text-primary text-xs font-medium py-2 px-4 text-center flex justify-center items-center gap-2">
-        <span className="inline-flex items-center gap-1">
+        <span className="inline-flex md:items-center items-start gap-1">
           <Heart className="w-3.5 h-3.5 fill-primary text-primary" /> {announcementBar}
         </span>
       </div>
 
       {/* Main Header */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/60 transition-all">
-        <div className="container-site h-20 flex items-center justify-between gap-4">
+        <div className="container-site h-16 sm:h-20 flex items-center justify-between gap-3 sm:gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
             {logoImageUrl ? (
-              <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-sm group-hover:scale-105 transition-transform bg-primary/10 flex items-center justify-center">
+              <div className="relative w-10 h-10 rounded-lg overflow-hidden shadow-sm group-hover:scale-105 transition-transform bg-primary/10 flex items-center justify-center">
                 <Image
                   src={logoImageUrl}
                   alt={brandName}
@@ -81,33 +82,32 @@ export function SiteLayout({ children }: SiteLayoutProps) {
                 />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-sm group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-sm group-hover:scale-105 transition-transform">
                 <Cat className="w-6 h-6" />
               </div>
             )}
             <div>
-              <span className="font-display font-bold text-xl tracking-tight block text-foreground group-hover:text-primary transition-colors">
+              <span className="font-display font-bold text-lg sm:text-xl tracking-tight block text-foreground group-hover:text-primary transition-colors">
                 {brandName}
               </span>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium block">
+              <span className="hidden min-[400px]:block text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
                 {brandTagline}
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav aria-label="Main navigation" className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const active = isActive(item.href);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    active
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${active
                       ? "text-primary bg-primary/10 font-semibold"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  }`}
+                    }`}
                 >
                   {item.label}
                 </Link>
@@ -127,44 +127,27 @@ export function SiteLayout({ children }: SiteLayoutProps) {
               className="md:hidden rounded-xl"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle Navigation"
+              aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              <Menu className="w-5 h-5" />
             </Button>
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-b border-border bg-card px-4 pt-2 pb-6 space-y-3 shadow-lg">
-            <nav className="flex flex-col space-y-1">
-              {navItems.map((item) => {
-                const active = isActive(item.href);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                      active
-                        ? "bg-primary text-primary-foreground font-semibold"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
-            <div className="pt-2">
-              <Button asChild className="w-full rounded-xl justify-center font-medium">
-                <Link href="/booking" onClick={() => setMobileMenuOpen(false)}>
-                  Book a Kitten <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        )}
       </header>
+
+      {/* Mobile Navigation Drawer (rendered outside the sticky header so the
+          fixed overlay is positioned against the viewport) */}
+      <MobileDrawer
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        navItems={navItems}
+        isActive={isActive}
+        brandName={brandName}
+        logoImageUrl={logoImageUrl}
+        phone={phone}
+        email={email}
+      />
 
       {/* Main Content Area */}
       <main className="flex-1">{children}</main>

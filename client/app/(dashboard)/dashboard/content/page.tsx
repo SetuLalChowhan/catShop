@@ -223,7 +223,7 @@ export default function FullCMSManagementPage() {
           </TabsList>
 
           {/* TAB 1: BRAND & NAVIGATION */}
-          <TabsContent value="brand" className="bg-card rounded-2xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
+          <TabsContent value="brand" className="bg-card rounded-xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
             <h2 className="font-display font-bold text-xl text-foreground">Brand Identity, Header & Footer CMS</h2>
 
             <div className="space-y-4">
@@ -266,7 +266,7 @@ export default function FullCMSManagementPage() {
           </TabsContent>
 
           {/* TAB 2: HOMEPAGE SECTIONS */}
-          <TabsContent value="home" className="bg-card rounded-2xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
+          <TabsContent value="home" className="bg-card rounded-xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
             <h2 className="font-display font-bold text-xl text-foreground">Homepage Sections Configuration</h2>
 
             <div className="space-y-6">
@@ -347,7 +347,7 @@ export default function FullCMSManagementPage() {
           </TabsContent>
 
           {/* TAB 3: ABOUT US PAGE */}
-          <TabsContent value="about" className="bg-card rounded-2xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
+          <TabsContent value="about" className="bg-card rounded-xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
             <h2 className="font-display font-bold text-xl text-foreground">About Us Page Configuration</h2>
 
             <div className="space-y-4">
@@ -379,7 +379,7 @@ export default function FullCMSManagementPage() {
           </TabsContent>
 
           {/* TAB 4: CONTACT INFO & SOCIAL LINKS */}
-          <TabsContent value="contact" className="bg-card rounded-2xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
+          <TabsContent value="contact" className="bg-card rounded-xl border border-border p-6 md:p-8 space-y-6 shadow-xs">
             <h2 className="font-display font-bold text-xl text-foreground">Contact Details & Social Media Links</h2>
 
             <div className="space-y-4">
