@@ -13,7 +13,7 @@ import AboutClient from "./about-client";
 export const revalidate = 60;
 
 export const metadata = buildMetadata({
-  title: "About Our Cattery — Ethical Cat Breeding",
+  title: "About Our Cattery | Ethical Cat Breeding",
   description:
     "Learn about Whisker Haven's family cattery, our ethical breeding standards, cage-free home environment, and how every kitten is health-checked and socialized.",
   keywords: [
@@ -43,7 +43,7 @@ export default async function AboutPage() {
       <JsonLd
         data={webPageJsonLd({
           path: "/about",
-          name: "About Our Cattery — Ethical Cat Breeding",
+          name: "About Our Cattery | Ethical Cat Breeding",
           description:
             "Learn about Whisker Haven's family cattery, ethical breeding standards, and how every kitten is raised.",
           type: "AboutPage",

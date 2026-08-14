@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: PageProps) {
   const url = absoluteUrl(`/cats/${cat.slug}`);
 
   return {
-    title: `${cat.name} — ${cat.breed} Kitten for Adoption`,
+    title: `${cat.name} | ${cat.breed} Kitten for Adoption`,
     description,
     keywords: [
       cat.breed,
@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: PageProps) {
     openGraph: {
       type: "website",
       siteName: "Whisker Haven",
-      title: `${cat.name} — ${cat.breed} Kitten for Adoption`,
+      title: `${cat.name} | ${cat.breed} Kitten for Adoption`,
       description,
       url,
       locale: "en_US",
@@ -86,7 +86,7 @@ export async function generateMetadata({ params }: PageProps) {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${cat.name} — ${cat.breed} Kitten for Adoption`,
+      title: `${cat.name} | ${cat.breed} Kitten for Adoption`,
       description,
       images: primaryImage ? [primaryImage] : [],
     },
@@ -124,7 +124,7 @@ export default async function CatDetailsPage({ params }: PageProps) {
         <JsonLd
           data={webPageJsonLd({
             path: `/cats/${cat.slug}`,
-            name: `${cat.name} — ${cat.breed} Kitten for Adoption`,
+            name: `${cat.name} | ${cat.breed} Kitten for Adoption`,
             description: catDescription(cat),
             type: "WebPage",
           })}

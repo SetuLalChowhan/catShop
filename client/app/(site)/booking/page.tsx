@@ -11,7 +11,7 @@ import BookingClient from "./booking-client";
 export const revalidate = 60;
 
 export const metadata = buildMetadata({
-  title: "Reserve a Kitten — Booking & Visit Inquiry",
+  title: "Reserve a Kitten | Booking & Visit Inquiry",
   description:
     "Submit a kitten reservation or cattery visit inquiry. Tell us which cat you're interested in and our team will confirm availability and visit arrangements.",
   keywords: [
@@ -41,7 +41,7 @@ export default async function BookingPage() {
       <JsonLd
         data={webPageJsonLd({
           path: "/booking",
-          name: "Reserve a Kitten — Booking & Visit Inquiry",
+          name: "Reserve a Kitten | Booking & Visit Inquiry",
           description:
             "Submit a kitten reservation or cattery visit inquiry to Whisker Haven.",
         })}

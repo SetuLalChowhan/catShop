@@ -13,9 +13,9 @@ import ContactClient from "./contact-client";
 export const revalidate = 60;
 
 export const metadata = buildMetadata({
-  title: "Contact Us — Visit or Inquire About Kittens",
+  title: "Contact Us | Visit or Inquire About Kittens",
   description:
-    "Have questions about our kittens, adoption process, or visiting the cattery? Call, email, or message us on Facebook Messenger — we respond within 24 hours.",
+    "Have questions about our kittens, adoption process, or visiting the cattery? Call, email, or message us on Facebook Messenger. We respond within 24 hours.",
   keywords: [
     "contact cattery",
     "kitten adoption questions",
@@ -44,7 +44,7 @@ export default async function ContactPage() {
       <JsonLd
         data={webPageJsonLd({
           path: "/contact",
-          name: "Contact Us — Visit or Inquire About Kittens",
+          name: "Contact Us | Visit or Inquire About Kittens",
           description:
             "Get in touch with Whisker Haven by phone, email, or Facebook Messenger.",
           type: "ContactPage",

@@ -47,7 +47,7 @@ export default async function HomePage() {
       <JsonLd
         data={webPageJsonLd({
           path: "/",
-          name: "Whisker Haven — Premium Kittens & Purebred Cats for Adoption",
+          name: "Whisker Haven | Premium Kittens & Purebred Cats for Adoption",
           description:
             "Whisker Haven is a family-run cattery raising healthy, vaccinated, and socialized purebred kittens in a loving home.",
           type: "WebPage",
