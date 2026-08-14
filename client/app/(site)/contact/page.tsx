@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { getData, postData, apiErrorMessage } from "@/lib/api";
 import { ContactInfo, WebsiteContent } from "@/types";
 import { safeExternalUrl } from "@/lib/format";
+import { ContactSkeleton } from "@/components/site/contact/ContactSkeleton";
 import { toast } from "sonner";
 
 const contactSchema = z.object({
@@ -26,6 +27,7 @@ type ContactFormValues = z.infer<typeof contactSchema>;
 
 export default function ContactPage() {
   const [contact, setContact] = useState<ContactInfo | null>(null);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [sentSuccess, setSentSuccess] = useState(false);
 
@@ -45,6 +47,8 @@ export default function ContactPage() {
         if (res?.contact) setContact(res.contact);
       } catch (err) {
         console.error("Failed to fetch contact details:", err);
+      } finally {
+        setLoading(false);
       }
     }
     fetchContact();
@@ -56,6 +60,10 @@ export default function ContactPage() {
   const messenger = safeExternalUrl(contact?.messenger, "https://m.me");
   const address = contact?.address || "123 Whisker Way, Loving Home Cattery";
   const hours = contact?.hours || "Mon - Sun: 9:00 AM - 7:00 PM (Visits by appointment)";
+
+  // Show the skeleton until the dynamic contact data arrives — no static
+  // placeholder flash before the real values render.
+  if (loading) return <ContactSkeleton />;
 
   const onSubmit = async (data: ContactFormValues) => {
     try {
