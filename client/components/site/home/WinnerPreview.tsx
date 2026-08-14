@@ -21,7 +21,7 @@ export function WinnerPreview({ winners, loading, content }: WinnerPreviewProps)
     "We celebrate our adopter community! Every month we reward top customer referrals and showcase our cat parent spotlight winners.";
   if (loading) {
     return (
-      <section className="py-16 bg-background">
+      <section className="py-10 sm:py-16 bg-background">
         <div className="container-site">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-3 animate-pulse">
             <Skeleton className="h-5 w-40 bg-muted/60 rounded-full mx-auto" />
@@ -52,7 +52,7 @@ export function WinnerPreview({ winners, loading, content }: WinnerPreviewProps)
     .slice(0, 3);
 
   return (
-    <section className="py-16 bg-background">
+    <section className="py-10 sm:py-16 bg-background">
       <div className="container-site">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">

@@ -18,7 +18,7 @@ export function ContactBanner({ contact }: ContactBannerProps) {
   const messenger = safeExternalUrl(contact?.messenger, "https://m.me");
 
   return (
-    <section className="py-16 bg-primary/5 border-t border-border/60">
+    <section className="py-10 sm:py-16 bg-primary/5 border-t border-border/60">
       <div className="container-site">
         <div className="bg-card rounded-xl border border-primary/20 p-8 md:p-12 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="space-y-3 text-center md:text-left max-w-xl">

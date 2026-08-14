@@ -1,6 +1,11 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { deleteData, getData, patchData, postData } from "./api";
 import type {
   Booking,
@@ -56,6 +61,34 @@ export function useCats() {
   });
 }
 
+/**
+ * Server-side search + filtering of the public cat listing.
+ * The backend applies search (name/breed), availability, breed and gender;
+ * the frontend debounces the search box and passes settled values here.
+ */
+export function useFilteredCats(params: {
+  search?: string;
+  availability?: string;
+  breed?: string;
+  gender?: string;
+}) {
+  const p = {
+    search: params.search || "",
+    availability: params.availability || "all",
+    breed: params.breed || "all",
+    gender: params.gender || "all",
+    limit: 50,
+  };
+  const url = buildAdminUrl("/api/cats", p);
+  return useQuery({
+    queryKey: ["cats", "filtered", p],
+    queryFn: () => getData<Cat[] | { cats: Cat[] }>(url),
+    // Keep showing the previous results while a new filter/search settles,
+    // so typing never flashes a skeleton on every keystroke.
+    placeholderData: keepPreviousData,
+  });
+}
+
 export function useWinners() {
   return useQuery({
     queryKey: queryKeys.winners,
@@ -97,6 +130,7 @@ export function useAdminCats(params: {
   return useQuery({
     queryKey: queryKeys.adminCats(p),
     queryFn: () => getData<Cat[] | { cats: Cat[]; pagination?: Pagination }>(url),
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -111,6 +145,7 @@ export function useAdminBookings(params: {
     queryKey: queryKeys.adminBookings(p),
     queryFn: () =>
       getData<Booking[] | { bookings: Booking[]; pagination?: Pagination }>(url),
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -125,6 +160,7 @@ export function useAdminContacts(params: {
     queryKey: queryKeys.adminContacts(p),
     queryFn: () =>
       getData<ContactMessage[] | { contacts: ContactMessage[]; pagination?: Pagination }>(url),
+    placeholderData: keepPreviousData,
   });
 }
 

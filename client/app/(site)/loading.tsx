@@ -5,10 +5,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SiteLoading() {
   return (
-    <div className="py-12 bg-background min-h-[70vh]">
-      <div className="container-site space-y-10 animate-pulse">
+    <div className="py-8 sm:py-12 bg-background min-h-[70vh]">
+      <div className="container-site space-y-6 sm:space-y-10 animate-pulse">
         {/* Banner / Hero Layout Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
           {/* Text Area Skeleton */}
           <div className="lg:col-span-7 space-y-5">
             <Skeleton className="h-6 w-44 rounded-full bg-muted/70" />

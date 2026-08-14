@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, Eye, Trash2, Mail, Phone, MessageSquare, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,14 +20,31 @@ import { toast } from "sonner";
 
 export default function ContactManagementPage() {
   const [search, setSearch] = useState("");
+  // Debounced copy of the search box — search runs on the backend, so we
+  // don't fire a request per keystroke.
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
 
   const [viewContact, setViewContact] = useState<ContactMessage | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ContactMessage | null>(null);
 
+  // Debounce the search box (350ms) before it hits the backend, and go back
+  // to page 1 once the settled query fires so results stay aligned.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   // Cached per page/status/search combination — revisits render instantly.
-  const contactsQuery = useAdminContacts({ page, status: statusFilter, search });
+  const contactsQuery = useAdminContacts({
+    page,
+    status: statusFilter,
+    search: debouncedSearch,
+  });
   const contacts = Array.isArray(contactsQuery.data)
     ? contactsQuery.data
     : contactsQuery.data?.contacts ?? [];
@@ -58,20 +75,6 @@ export default function ContactManagementPage() {
       toast.error(apiErrorMessage(err, "Failed to delete contact message"));
     }
   };
-
-  const filteredContacts = useMemo(() => {
-    return contacts.filter((c) => {
-      if (statusFilter !== "all" && c.status !== statusFilter) return false;
-      if (search.trim() !== "") {
-        const q = search.toLowerCase();
-        const matchName = c.name.toLowerCase().includes(q);
-        const matchEmail = c.email.toLowerCase().includes(q);
-        const matchSubject = c.subject.toLowerCase().includes(q);
-        if (!matchName && !matchEmail && !matchSubject) return false;
-      }
-      return true;
-    });
-  }, [contacts, statusFilter, search]);
 
   const statusBadge = (status: string) => {
     switch (status) {
@@ -132,7 +135,7 @@ export default function ContactManagementPage() {
       <div className="bg-card rounded-xl border border-border shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-muted-foreground">Loading contact messages...</div>
-        ) : filteredContacts.length === 0 ? (
+        ) : contacts.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">No contact messages found.</div>
         ) : (
           <div className="overflow-x-auto">
@@ -147,7 +150,7 @@ export default function ContactManagementPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filteredContacts.map((contact) => (
+                {contacts.map((contact) => (
                   <tr key={contact._id} className="hover:bg-muted/30 transition-colors">
                     <td className="py-3 px-4 font-semibold text-foreground">
                       {contact.name}

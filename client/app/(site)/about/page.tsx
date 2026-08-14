@@ -21,15 +21,15 @@ export default function AboutPage() {
 
   if (loading) {
     return (
-      <div className="py-12 bg-background">
-        <div className="container-site space-y-12 animate-pulse">
+      <div className="py-8 sm:py-12 bg-background">
+        <div className="container-site space-y-8 sm:space-y-12 animate-pulse">
           <div className="max-w-3xl space-y-3">
             <Skeleton className="h-5 w-36 bg-muted/60 rounded-full" />
             <Skeleton className="h-10 w-4/5 bg-muted/70 rounded-xl" />
             <Skeleton className="h-5 w-3/5 bg-muted/50 rounded-lg" />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
             <div className="lg:col-span-6 space-y-4">
               <Skeleton className="h-7 w-56 bg-muted/70 rounded-lg" />
               <Skeleton className="h-4 w-full bg-muted/50 rounded-md" />
@@ -47,8 +47,8 @@ export default function AboutPage() {
   }
 
   return (
-    <div className="py-12 bg-background">
-      <div className="container-site space-y-12">
+    <div className="py-8 sm:py-12 bg-background">
+      <div className="container-site space-y-8 sm:space-y-12">
         {/* Header */}
         <div className="max-w-3xl space-y-3">
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
@@ -64,7 +64,7 @@ export default function AboutPage() {
         </div>
 
         {/* Story Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
           <div className="lg:col-span-6 space-y-6">
             <h2 className="font-display font-bold text-2xl text-foreground">Our Background & Story</h2>
             <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">

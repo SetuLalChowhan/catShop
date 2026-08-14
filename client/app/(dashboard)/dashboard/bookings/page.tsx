@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, Eye, Trash2, Calendar, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,15 +20,32 @@ import { toast } from "sonner";
 
 export default function BookingManagementPage() {
   const [search, setSearch] = useState("");
+  // Debounced copy of the search box — search runs on the backend, so we
+  // don't fire a request per keystroke.
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
 
   const [viewBooking, setViewBooking] = useState<Booking | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Booking | null>(null);
 
+  // Debounce the search box (350ms) before it hits the backend, and go back
+  // to page 1 once the settled query fires so results stay aligned.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   // Cached per page/status/search combination: switching sections or pages
   // shows previously fetched data instantly instead of re-loading every time.
-  const bookingsQuery = useAdminBookings({ page, status: statusFilter, search });
+  const bookingsQuery = useAdminBookings({
+    page,
+    status: statusFilter,
+    search: debouncedSearch,
+  });
   const bookings = Array.isArray(bookingsQuery.data)
     ? bookingsQuery.data
     : bookingsQuery.data?.bookings ?? [];
@@ -59,20 +76,6 @@ export default function BookingManagementPage() {
       toast.error(apiErrorMessage(err, "Failed to delete booking"));
     }
   };
-
-  const filteredBookings = useMemo(() => {
-    return bookings.filter((b) => {
-      if (statusFilter !== "all" && b.status !== statusFilter) return false;
-      if (search.trim() !== "") {
-        const q = search.toLowerCase();
-        const matchName = b.customerName.toLowerCase().includes(q);
-        const matchEmail = b.email.toLowerCase().includes(q);
-        const matchPhone = b.phone.toLowerCase().includes(q);
-        if (!matchName && !matchEmail && !matchPhone) return false;
-      }
-      return true;
-    });
-  }, [bookings, statusFilter, search]);
 
   const bookingBadge = (status: string) => {
     switch (status) {
@@ -133,7 +136,7 @@ export default function BookingManagementPage() {
       <div className="bg-card rounded-xl border border-border shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-muted-foreground">Loading bookings...</div>
-        ) : filteredBookings.length === 0 ? (
+        ) : bookings.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">No bookings found.</div>
         ) : (
           <div className="overflow-x-auto">
@@ -149,7 +152,7 @@ export default function BookingManagementPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filteredBookings.map((booking) => {
+                {bookings.map((booking) => {
                   const catObj = typeof booking.cat === "object" ? booking.cat : null;
                   return (
                     <tr key={booking._id} className="hover:bg-muted/30 transition-colors">

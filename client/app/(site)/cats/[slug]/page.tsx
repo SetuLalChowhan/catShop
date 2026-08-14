@@ -79,14 +79,14 @@ export default async function CatDetailsPage({ params }: PageProps) {
   };
 
   return (
-    <div className="py-10 bg-background">
-      <div className="container-site space-y-8">
+    <div className="py-6 sm:py-10 bg-background">
+      <div className="container-site space-y-6 sm:space-y-8">
         {/* Back Link */}
         <Link href="/cats" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to All Cats
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
           {/* Left Column: Image Gallery (hover zoom + click to open lightbox) */}
           <div className="lg:col-span-7">
             <CatGallery

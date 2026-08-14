@@ -75,8 +75,8 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="py-12 bg-background">
-      <div className="container-site space-y-12">
+    <div className="py-8 sm:py-12 bg-background">
+      <div className="container-site space-y-8 sm:space-y-12">
         {/* Header */}
         <div className="max-w-2xl space-y-3">
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
@@ -90,7 +90,7 @@ export default function ContactPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
           {/* Contact Details Left */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-4">

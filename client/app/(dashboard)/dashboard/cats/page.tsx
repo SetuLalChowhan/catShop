@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -219,20 +219,6 @@ export default function CatManagementPage() {
     }
   };
 
-  const filteredCats = useMemo(() => {
-    return cats.filter((cat) => {
-      if (availabilityFilter !== "all" && cat.availability !== availabilityFilter) return false;
-      if (search.trim() !== "") {
-        const q = search.toLowerCase();
-        return (
-          cat.name.toLowerCase().includes(q) ||
-          cat.breed.toLowerCase().includes(q)
-        );
-      }
-      return true;
-    });
-  }, [cats, availabilityFilter, search]);
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -282,7 +268,7 @@ export default function CatManagementPage() {
       <div className="bg-card rounded-xl border border-border shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-muted-foreground">Loading cat inventory...</div>
-        ) : filteredCats.length === 0 ? (
+        ) : cats.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">No cats found.</div>
         ) : (
           <div className="overflow-x-auto">
@@ -299,7 +285,7 @@ export default function CatManagementPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filteredCats.map((cat) => (
+                {cats.map((cat) => (
                   <tr key={cat._id} className="hover:bg-muted/30 transition-colors">
                     <td className="py-3 px-4">
                       <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-muted border border-border">

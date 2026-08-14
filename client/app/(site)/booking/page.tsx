@@ -89,8 +89,8 @@ function BookingContent() {
   };
 
   return (
-    <div className="py-12 bg-background min-h-[75vh]">
-      <div className="container-site max-w-4xl space-y-8">
+    <div className="py-8 sm:py-12 bg-background min-h-[75vh]">
+      <div className="container-site max-w-4xl space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="text-center space-y-3 max-w-2xl mx-auto">
           <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">

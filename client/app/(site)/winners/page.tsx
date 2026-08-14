@@ -21,8 +21,8 @@ export default function WinnersPage() {
   const otherWinners = winners.filter((w) => w._id !== winnerOfMonth?._id);
 
   return (
-    <div className="py-12 bg-background">
-      <div className="container-site space-y-12">
+    <div className="py-8 sm:py-12 bg-background">
+      <div className="container-site space-y-8 sm:space-y-12">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-soft text-amber-deep text-xs font-semibold uppercase tracking-wider">

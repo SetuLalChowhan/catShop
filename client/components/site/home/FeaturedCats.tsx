@@ -23,7 +23,7 @@ export function FeaturedCats({ cats, loading = false, onBookClick, content }: Fe
     "Explore our current litter of health-checked, pedigreed kittens. Each cat is raised with individual love and preparation for their forever home.";
 
   return (
-    <section className="py-16 bg-cream/50 border-y border-border/60">
+    <section className="py-10 sm:py-16 bg-cream/50 border-y border-border/60">
       <div className="container-site">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">

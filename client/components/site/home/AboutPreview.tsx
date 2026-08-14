@@ -16,7 +16,7 @@ interface AboutPreviewProps {
 export function AboutPreview({ content, loading }: AboutPreviewProps) {
   if (loading || !content) {
     return (
-      <section className="py-16 bg-cream/30 border-t border-border/60">
+      <section className="py-10 sm:py-16 bg-cream/30 border-t border-border/60">
         <div className="container-site">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center animate-pulse">
             <div className="lg:col-span-6">
@@ -42,7 +42,7 @@ export function AboutPreview({ content, loading }: AboutPreviewProps) {
   const mainImage = images[0]?.url || "https://images.unsplash.com/photo-1573865526739-10659fec78a5?q=80&w=800&auto=format&fit=crop";
 
   return (
-    <section className="py-16 bg-cream/30 border-t border-border/60">
+    <section className="py-10 sm:py-16 bg-cream/30 border-t border-border/60">
       <div className="container-site">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Image Collage */}
